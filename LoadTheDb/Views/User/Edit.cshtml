@@ -1,0 +1,79 @@
+﻿@model JustCare_MB.Dtos.UserDto
+       @* Id FullName Email PhoneNumber Age NationalId *@
+                       
+
+<form asp-action="Edit">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Edit User</h1>
+        <hr />
+
+        <input hidden asp-for="Id" />
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+
+            <div class="col-2">
+                <label asp-for="FullName" class="control-lable pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+
+            <div class="col-2">
+                <label asp-for="Email" class="control-lable pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+
+            
+
+            <div class="col-2">
+                <label asp-for="PhoneNumber" class="control-lable pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="PhoneNumber" class="form-control" />
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+
+            <div class="col-2">
+                <label asp-for="Age" class="control-lable pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+
+            <div class="col-2">
+                <label asp-for="NationalId" class="control-lable pt-2" style="font-size:20px;"></label>
+            </div>
+            <div class="col-10 pb-3">
+                <input asp-for="NationalId" class="form-control">
+                <span asp-validation-for="NationalId" class="text-danger"></span>
+            </div>
+
+              <div class="col-5 offset-2">
+            <a asp-action="Index" asp-controller="User" class="btn-primary btn form-control">Back to User list</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Save Updates" class="btn btn-success form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}
+
+
+
+

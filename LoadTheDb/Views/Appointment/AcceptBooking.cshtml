@@ -1,0 +1,87 @@
+﻿@model IEnumerable<JustCare_MB.Dtos.AppointmentDtos.WaitingApprovalAppointmentsBooked>
+
+
+<br />
+<div class="container p-4 border">
+    <div class="row pd-2">
+        <div class="col">
+            <h1 class="text-primary">AppoitnmentBooked accepted</h1>
+        </div>
+        <div class="col text-end pt-1">
+            <a asp-controller="Appointment" asp-action="index" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i>back to category</a>
+        </div>
+    </div>
+
+    @* <form asp-action="Index" method="get">
+    <div class="form-actions no-color">
+    <p>
+    Find by name, id or email: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
+    <input type="submit" value="Search" class="btn btn-default" /> |
+    <a asp-action="Index">Back to Full List</a>
+    </p>
+    </div>
+    </form>*@
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>
+                    Images
+                </th>
+                <th>
+                    Note
+                </th>
+                <th>
+                    Patient Number Phone
+                </th>
+                <th>
+                    Category name
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Image</td>
+                    <td>@item.Note</td>
+                    <td>@item.PatientUser.PhoneNumber</td>
+                    <td>@item.Category.ArabicName</td>
+                    <td>@item.Date</td>
+
+                    <td>
+
+                        @* <a asp-controller="User" asp-action="Edit" asp-route-villaId="@item.Id" class="btn btn-success"> <i class="bi bi-pencil-square">Edit User</i> </a> *@
+                        @* <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-success"> <i class="bi bi-pencil-square">Edit User</i> </a> *@
+                        <div class="col-5">
+                            <form asp-action="Accepted_Rejected" asp-route-id="@item.PatientUser.Id" asp-route-status="Accepted">
+                                <input type="submit" value="Accept" class="btn btn-success" />
+                            </form>
+                        </div>
+
+                        <div class="col-5">
+                            <form asp-action="Accepted_Rejected" asp-route-id="@item.PatientUser.Id" asp-route-status="Rejected">
+                                <input type="submit" value="Reject" class="btn btn-danger form-control" />
+                            </form>
+                        </div>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+
+</div>
+
+
+
+
+

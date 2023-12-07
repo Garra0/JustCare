@@ -1,0 +1,41 @@
+﻿@model JustCare_MB.Dtos.AppointmentDtos.CreateAppointmentDto
+
+<form method="post" asp-action="Create">
+    <br />
+    <div class="container border p-3">
+        <h1 class="text-primary">Start Appointment</h1>
+        <hr />
+        <input hidden asp-for="CategoryId" />
+
+        <div class="row">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="col-2">
+                    <label class="control-lable pt-2" style="font-size:20px;">@Model.CategoryName</label>
+            </div>
+            
+            
+            <div class="form-group">
+                <label asp-for="Date" class="control-label"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <div class="col-5 offset-2">
+                <a asp-action="Index" asp-controller="Appointment" class="btn-primary btn form-control">Back to list</a>
+            </div>
+            <div class="col-5">
+                <input type="submit" value="Create the appointment" class="btn btn-success form-control" />
+            </div>
+        </div>
+    </div>
+</form>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial.cshtml" />
+}
+
+
+
+

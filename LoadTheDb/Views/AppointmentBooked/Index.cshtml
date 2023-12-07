@@ -1,0 +1,39 @@
+﻿@model IEnumerable<JustCare_MB.Dtos.AppointmentBookedDtos.CategoryDto>
+
+<h1>
+    Patient page
+</h1>
+<div class="col text-end pt-1">
+    <a asp-controller="AppointmentBooked" asp-action="MyAppointment" class="btn btn-outline-primary"><i class="bi bi-plus-square-fill"></i>My Appointments</a>
+</div>
+
+
+<br />
+<div class="container p-4 border">
+    <div class="row pd-2">
+        <div class="col">
+            <h1 class="text-primary">Category List</h1>
+        </div>
+        <div class="col text-end pt-1">
+        </div>
+    </div>
+
+
+    @foreach (var item in Model)
+    {
+        <a asp-controller="AppointmentBooked" asp-action="ChooseCategory" asp-route-Categoryid="@item.Id" class="btn btn-outline-primary">
+            <i class="bi bi-plus-square-fill">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" src=".../100px180/" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.ArabicName</h5>
+                    </div>
+                </div>
+            </i>
+        </a>
+    }
+
+
+</div>
+
+
