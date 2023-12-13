@@ -4,6 +4,7 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace JustCareAPI.Controllers
 {
@@ -53,20 +54,41 @@ namespace JustCareAPI.Controllers
         }
 
         [HttpPut("{id:int}", Name = "UpdateAppointment")]
-        public async Task<ActionResult> UpdateAppointment(int id,UpdateAppointmentDto appointmentDto)
+        public async Task<IActionResult> UpdateAppointment(int id, UpdateAppointmentDto appointmentDto)
         {
             await _appointmentService.UpdateAppointment(id, appointmentDto);
-                return Ok();
+            return Ok();
         }
 
-        //Task UpdateAppointment(CreateAppointmentDto appointmentDto);
-        //Task<IEnumerable<Category>> GetAllCategories();
+        [HttpGet("GetAllCategorys")]
+        public async Task<IActionResult> GetAllCategorys()
+        {
+            IEnumerable<Category> categories = await _appointmentService.GetAllCategories();
+            return Ok(categories);
+        }
+
+
         //Task<Category> getCategoryObject(int id);
         //Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);
         //Task<IEnumerable<WaitingApprovalAppointmentsBooked>> AllWaitingApprovalAppointments();
-        //Task AppointmentStatus(int id, string status);
 
-
-
+        [HttpGet("MyAppointments")]
+        public async Task<IActionResult> MyAppointments()
+        {
+            IEnumerable<AppointmentDto> AppointmentList;
+            AppointmentList = await _appointmentService.GetAllAppointments();
+            return Ok(AppointmentList);
+        }
     }
 }
+
+
+//public async Task<IActionResult> AcceptBooking()
+//{
+//    return View(await _appointmentService.AllWaitingApprovalAppointments());
+//}
+//public async Task<IActionResult> Accepted_Rejected(int id, string status)
+//{
+//    await _appointmentService.AppointmentStatus(id, status);
+//    return RedirectToAction(nameof(Index));
+//}

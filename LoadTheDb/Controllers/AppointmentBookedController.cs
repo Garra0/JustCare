@@ -22,9 +22,10 @@ namespace LoadTheDb.Controllers
             return View(categories);
         }
 
+        // show the avalibaly dates
         public async Task<IActionResult> ChooseCategory(int Categoryid)
         {
-            DatesDto datesDto = await _appointmentBookedService.GetAllDatesDtoById(Categoryid);
+            DatesDto datesDto = await _appointmentBookedService.GetAllDatesDtoByCategoryId(Categoryid);
             return View(datesDto);
         }
         [HttpPost]
@@ -47,7 +48,7 @@ namespace LoadTheDb.Controllers
         public async Task<IActionResult> MyAppointment()
         {
             IEnumerable<AppointmentBookedDtos> AppointmentBookedList;
-            AppointmentBookedList = await _appointmentBookedService.GetAllAppointmentsBooked();
+            AppointmentBookedList = await _appointmentBookedService.GetAllAppointmentsBookedByUserToken();
             return View(AppointmentBookedList);
         }
 

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is used by the publish/package process of your Web project. You can customize the behavior of this process
+by editing this MSBuild file. In order to learn more about this please visit https://go.microsoft.com/fwlink/?LinkID=208121. 
+-->
+<Project>
+  <PropertyGroup>
+    <TimeStampOfAssociatedLegacyPublishXmlFile />
+    <EncryptedPassword>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAWv8M6Xx07EG35zwPK/z8MgAAAAACAAAAAAAQZgAAAAEAACAAAABHAT+jNaviVa5tiR+eKM/216yTTXsSZAaQKXMfZ7Fm0gAAAAAOgAAAAAIAACAAAADoHaghZ4lNby692rcBsUS86ioCSjwfMoEqpDO+PHG+rYAAAACTQ8SrO9N31UpL2VPUnRBuLhpky323lfkpKk8bAXDFEdu3mu4r3oJ0+2raz+K7Er5r0YH6UZIvv6GyT5nR4jQ0Yl2lkwj4Tj7VnPPH3VoBchgRQKTr873AxhlekjL+99HNuEorYl32hIDoXzN9H0KEgLJnK3FR02akWYXJ7W90PEAAAAAm4PSt36XGNbxDi3k7BuVp/gUZnoTZjHB6vBwBziXuoDtmN3D3LooB2p4rlt96/4lbmYPsivRwTUErXqEJua6K</EncryptedPassword>
+    <History>True|2023-12-12T06:31:14.6312125Z;True|2023-12-12T09:21:02.0115165+03:00;True|2023-12-11T15:26:17.4378329+03:00;True|2023-12-11T15:05:03.6162956+03:00;True|2023-12-10T14:49:33.4433715+03:00;True|2023-12-10T14:27:09.2079791+03:00;True|2023-12-10T14:20:33.8881622+03:00;True|2023-12-10T14:19:44.7150721+03:00;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
+  <ItemGroup>
+    <DestinationConnectionStrings Include="Munson:SqlDb">
+      <Value>Server=tcp:justcare-server.database.windows.net,1433%3bInitial Catalog=JustCareDb%3bPersist Security Info=False%3bUser ID=Smail_-%3bPassword=OsamaOsama_2002%3b</Value>
+    </DestinationConnectionStrings>
+  </ItemGroup>
+</Project>

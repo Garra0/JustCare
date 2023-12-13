@@ -1,0 +1,882 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "JustCareAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "version": "1.0"
+  },
+  "paths": {
+    "/AppointmentAPI": {
+      "get": {
+        "tags": [
+          "Appointment"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/AppointmentDto"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Appointment"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateAppointmentDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentAPI/{id}": {
+      "delete": {
+        "tags": [
+          "Appointment"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Appointment"
+        ],
+        "operationId": "UpdateAppointment",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateAppointmentDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentAPI/GetAllCategorys": {
+      "get": {
+        "tags": [
+          "Appointment"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentAPI/MyAppointments": {
+      "get": {
+        "tags": [
+          "Appointment"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentBookedAPI/GetAllAppointmentBooked": {
+      "get": {
+        "tags": [
+          "AppointmentBooked"
+        ],
+        "operationId": "GetAllAppointmentBooked",
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentBookedAPI/GetAllCategories": {
+      "get": {
+        "tags": [
+          "AppointmentBooked"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentBookedAPI/{Categoryid}": {
+      "get": {
+        "tags": [
+          "AppointmentBooked"
+        ],
+        "operationId": "GetAllDatesDtoByCategoryId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Categoryid",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/AppointmentBookedAPI": {
+      "post": {
+        "tags": [
+          "AppointmentBooked"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/CreateAppointmentBookedDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/UserAPI/Login": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/UserLogin"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/UserAPI": {
+      "post": {
+        "tags": [
+          "User"
+        ],
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/UserRegisterDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "SearchTerm",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/UserDto"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/UserAPI/{id}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "GetUser",
+        "produces": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "operationId": "UpdateVilla",
+        "consumes": [
+          "application/json",
+          "text/json",
+          "application/*+json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "schema": {
+              "$ref": "#/definitions/UserDto"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/UserAPI/Dentists": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Appointment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "dentistUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "dentistUser": {
+          "$ref": "#/definitions/User"
+        },
+        "categoryId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "category": {
+          "$ref": "#/definitions/Category"
+        },
+        "appointmentBooked": {
+          "$ref": "#/definitions/AppointmentBooked"
+        }
+      }
+    },
+    "AppointmentBooked": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "status": {
+          "maxLength": 70,
+          "minLength": 0,
+          "type": "string"
+        },
+        "image": {
+          "maxLength": 500,
+          "minLength": 0,
+          "type": "string"
+        },
+        "note": {
+          "maxLength": 500,
+          "minLength": 0,
+          "type": "string"
+        },
+        "appointment": {
+          "$ref": "#/definitions/Appointment"
+        },
+        "appointmentId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "patientUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "patientUser": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "AppointmentDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "dentistUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoryArabicName": {
+          "type": "string"
+        }
+      }
+    },
+    "Category": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "image": {
+          "maxLength": 500,
+          "minLength": 0,
+          "type": "string"
+        },
+        "englishName": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "arabicName": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Appointment"
+          }
+        }
+      }
+    },
+    "CreateAppointmentBookedDto": {
+      "type": "object",
+      "properties": {
+        "appointmentId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "date": {
+          "format": "date-time",
+          "type": "string"
+        },
+        "categoryName": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "CreateAppointmentDto": {
+      "required": [
+        "categoryId",
+        "dentistUserId"
+      ],
+      "type": "object",
+      "properties": {
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "dentistUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoryId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoryName": {
+          "type": "string"
+        }
+      }
+    },
+    "Gender": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "englishType": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "arabicType": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      }
+    },
+    "MedicalHistory": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "englishDisease": {
+          "maxLength": 150,
+          "minLength": 0,
+          "type": "string"
+        },
+        "arabicDisease": {
+          "maxLength": 150,
+          "minLength": 0,
+          "type": "string"
+        },
+        "medicalHistoryStatuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MedicalHistoryStatus"
+          }
+        }
+      }
+    },
+    "MedicalHistoryStatus": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "userId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "medicalHistoryId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "medicalHistory": {
+          "$ref": "#/definitions/MedicalHistory"
+        }
+      }
+    },
+    "UpdateAppointmentDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "date": {
+          "format": "date",
+          "type": "string"
+        },
+        "dentistUserId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "categoryId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "User": {
+      "required": [
+        "email",
+        "phoneNumber"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fullName": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "password": {
+          "maxLength": 100,
+          "minLength": 0,
+          "type": "string"
+        },
+        "email": {
+          "maxLength": 100,
+          "minLength": 0,
+          "type": "string"
+        },
+        "phoneNumber": {
+          "minLength": 1,
+          "pattern": "^(\\+9627[7-9][0-9]{7})|^([0][7][7-9][0-9]{7})$",
+          "type": "string"
+        },
+        "age": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "nationalId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "userTypeId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "userType": {
+          "$ref": "#/definitions/UserType"
+        },
+        "genderId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "gender": {
+          "$ref": "#/definitions/Gender"
+        },
+        "medicalHistoryStatuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MedicalHistoryStatus"
+          }
+        },
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Appointment"
+          }
+        },
+        "appointmentBookeds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppointmentBooked"
+          }
+        }
+      }
+    },
+    "UserDto": {
+      "required": [
+        "age",
+        "email",
+        "fullName",
+        "phoneNumber"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "fullName": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "email": {
+          "maxLength": 100,
+          "minLength": 0,
+          "pattern": "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          "type": "string"
+        },
+        "phoneNumber": {
+          "minLength": 1,
+          "pattern": "^(\\+9627[7-9][0-9]{7})|^([0][7][7-9][0-9]{7})$",
+          "type": "string"
+        },
+        "age": {
+          "format": "int32",
+          "maximum": 120,
+          "minimum": 3,
+          "type": "integer"
+        },
+        "nationalId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "UserLogin": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "UserRegisterDto": {
+      "required": [
+        "age",
+        "confirmationPassword",
+        "email",
+        "fullName",
+        "genderId",
+        "password",
+        "phoneNumber",
+        "userTypeId"
+      ],
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "password": {
+          "maxLength": 100,
+          "minLength": 6,
+          "type": "string"
+        },
+        "confirmationPassword": {
+          "maxLength": 100,
+          "minLength": 6,
+          "type": "string"
+        },
+        "email": {
+          "maxLength": 100,
+          "minLength": 0,
+          "pattern": "^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+          "type": "string"
+        },
+        "phoneNumber": {
+          "minLength": 1,
+          "pattern": "^(\\+9627[7-9][0-9]{7})|^([0][7][7-9][0-9]{7})$",
+          "type": "string"
+        },
+        "age": {
+          "format": "int32",
+          "maximum": 120,
+          "minimum": 3,
+          "type": "integer"
+        },
+        "nationalId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "userTypeId": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "genderId": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "UserType": {
+      "required": [
+        "id"
+      ],
+      "type": "object",
+      "properties": {
+        "id": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "englishType": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "arabicType": {
+          "maxLength": 50,
+          "minLength": 0,
+          "type": "string"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\""
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}

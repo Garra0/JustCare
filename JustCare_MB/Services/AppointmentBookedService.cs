@@ -2,12 +2,9 @@
 using JustCare_MB.Data;
 using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
-using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace JustCare_MB.Services
 {
@@ -29,7 +26,7 @@ namespace JustCare_MB.Services
             IEnumerable<CategoryDto> categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
             return categoryDtos;
         }
-        private async Task<DatesDto> CreateDateDto(int Categoryid)
+        private async Task<DatesDto> GetAllAvailableAppointmentByCategoryId(int Categoryid)
         {
             if (_context.Categories == null)
                 throw new Exception("Categories is null");
@@ -50,6 +47,8 @@ namespace JustCare_MB.Services
             //3-
             // when the appointment is booked its wont shown on the appointments page
             // and the appointments will shown 
+
+            // if the appointment on the appointmentBooked then i dont need to booked it again!
             var appointmentBooked_AppointmentIds = await _context.AppointmentBookeds.
                 Select(e => e.AppointmentId).ToListAsync();
 
@@ -69,13 +68,13 @@ namespace JustCare_MB.Services
             dto.DateInformation = Dates;
             return dto;
         }
-        public async Task<DatesDto> GetAllDatesDtoById(int Categoryid)
+        public async Task<DatesDto> GetAllDatesDtoByCategoryId(int Categoryid)
         {
             if (Categoryid == 0)
                 throw new Exception("id cant be 0");
             if (_context.Appointments == null)
                 throw new Exception("There are no appointments");
-            DatesDto datesDto = await CreateDateDto(Categoryid);
+            DatesDto datesDto = await GetAllAvailableAppointmentByCategoryId(Categoryid);
             return datesDto;
         }
 
@@ -87,9 +86,13 @@ namespace JustCare_MB.Services
             if (_context.Appointments == null)
                 throw new Exception("There are no appointments");
 
-            DateTime date = await _context.Appointments.Where(e => e.Id == AppointmentId).Select(e => e.Date).FirstOrDefaultAsync();
+            DateTime date = await _context.Appointments
+                .Where(e => e.Id == AppointmentId).Select(e => e.Date)
+                .FirstOrDefaultAsync();
             // select category name -> appointment -> categoryId -> categoryName
-            int CategoryId = await _context.Appointments.Where(e => e.Id == AppointmentId).Select(e => e.CategoryId).FirstOrDefaultAsync();
+            int CategoryId = await _context.Appointments
+                .Where(e => e.Id == AppointmentId).Select(e => e.CategoryId)
+                .FirstOrDefaultAsync();
             if (CategoryId == 0)
                 throw new Exception("CategoryId cant be 0");
             if (_context.Categories == null)
@@ -159,7 +162,7 @@ namespace JustCare_MB.Services
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBooked()
+        public async Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken()
         {
 
             IEnumerable<AppointmentBookedDtos> appointmentBookedDtos =

@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace JustCareAPI.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("UserAPI")]
     public class UserController : Controller
@@ -21,14 +22,20 @@ namespace JustCareAPI.Controllers
         // (all users who have not been authenticated)
         [AllowAnonymous]
         [HttpPost("Login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Login([FromBody] UserLogin userLogin)
         {
-            string token = await _userService.Login(userLogin);
-            if (token != null)
+            try
             {
+                string token = await _userService.Login(userLogin);
                 return Ok(token);
             }
-            return NotFound("user not found");
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
 
 
@@ -41,62 +48,100 @@ namespace JustCareAPI.Controllers
         //        return BadRequest();
         //    return Ok();
         //}
-
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<ActionResult> CreateUser(UserRegisterDto userRegisterDto)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateUser(UserRegisterDto userRegisterDto)
         {
-            bool isSuccess = await _userService.CreateUser(userRegisterDto);
-            if (isSuccess)
+            try
             {
+                await _userService.CreateUser(userRegisterDto);
                 return Ok();
             }
-            return BadRequest();
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+
         }
 
         [HttpGet]
-        public async Task<IEnumerable<UserDto>> GetAllUser(string? SearchTerm = null)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        // [ProducesResponseType(StatusCodes.Status401Unauthorized)] the use cant be Unauthorized right?
+        // [ProducesResponseType(StatusCodes.Status403Forbidden)] the other user cant see the fun..
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUser(string? SearchTerm = null)
         {
+            try
+            {
+                UsersIndexDto usersIndex = await _userService.GetAllUsers(SearchTerm);
+                return Ok(usersIndex.Users);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
 
-            UsersIndexDto usersIndexDto = new UsersIndexDto();
-            if (SearchTerm != null)
-                usersIndexDto.SearchTerm = SearchTerm;
-
-            UsersIndexDto usersIndex = await _userService.GetAllUsers(usersIndexDto);
-            return usersIndex.Users;
 
         }
 
         [HttpGet("{id:int}", Name = "GetUser")]
-        public async Task<User> GetUser(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<User>> GetUserById(int id)
         {
-            User user = await _userService.GetUserById(id);
-            return user;
-
+            try
+            {
+                User user = await _userService.GetUserById(id);
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                if(ex.Message== "id cant be 0")
+                    return BadRequest(ex.Message);
+                return NotFound(ex.Message);
+            }
         }
 
 
-        
-
         [HttpDelete("{id:int}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteUser(int id)
         {
-            bool isSuccess = await _userService.DeleteUser(id);
-            if (isSuccess)
+            try
             {
-                return Ok(id);
+                await _userService.DeleteUser(id);
+                return Ok();
             }
-            return BadRequest(id);
+            catch (Exception ex)
+            {
+                if (ex.Message == "id cant be 0")
+                    return BadRequest(ex.Message);
+                return NotFound(ex.Message);
+            }
+
         }
 
         [HttpPut("{id:int}", Name = "UpdateVilla")]
         public async Task<ActionResult> UpdateUser(int id, UserDto userEdited)
         {
-            bool isSuccess = await _userService.UpdateUser(id, userEdited);
-            if (isSuccess)
+            try
             {
-                return Ok(userEdited);
+                await _userService.UpdateUser(id, userEdited);
+                return Ok();
             }
-            return BadRequest(userEdited);
+            catch (Exception ex)
+            {
+                if (ex.Message == "id cant be 0")
+                    return BadRequest(ex.Message);
+                return NotFound(ex.Message);
+            }
 
         }
 

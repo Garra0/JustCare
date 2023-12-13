@@ -30,12 +30,14 @@ namespace JustCare_MB.Services
         {
             // email and password
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
-                userLogin.Email.ToLower() && x.Password == userLogin.Password);
-            if (currentUser != null)
-            {
-                return currentUser;
-            }
-            return null;
+                userLogin.Email.ToLower());
+            if (currentUser == null)
+                throw new Exception("this Email not exist");
+
+            if (currentUser.Password != userLogin.Password)
+                throw new Exception("Invalid password");
+
+            return currentUser;
         }
 
         // To generate token
@@ -74,34 +76,41 @@ namespace JustCare_MB.Services
 
         public async Task<string> Login(UserLogin userLogin)
         {
-            var user = Authenticate(userLogin);// user exist?
-            if (user != null)
+            try
             {
-               var token =await GenerateToken(user);
+                var user = Authenticate(userLogin);// user exist?
+                var token = await GenerateToken(user);
                 return token;
             }
-             
-            return "user not found";
+            catch
+            (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
 
 
 
-        public async Task<bool> CreateUser(UserRegisterDto userRegister)
+        public async Task CreateUser(UserRegisterDto userRegister)
         {
-            if (_context.Users
-                .Any(u => u.Email.ToLower() ==
-                userRegister.Email.ToLower()))
-                throw new Exception("user Exists");
+            try
+            {
+                if (userRegister == null)
+                    throw new Exception("null inputs");
 
-            if (userRegister == null)
-                throw new Exception("user null");
+                if (_context.Users.Any(u => u.Email.ToLower()
+                == userRegister.Email.ToLower()))
+                    throw new Exception("Email exists");
 
-
-            User user = _mapper.Map<User>(userRegister);
-            await _context.Users.AddAsync(user);
-            await _context.SaveChangesAsync();
-            return true;
+                User user = _mapper.Map<User>(userRegister);
+                await _context.Users.AddAsync(user);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
 
         //public async Task<bool> Register(UserRegisterDto userRegisterDto)
@@ -127,28 +136,41 @@ namespace JustCare_MB.Services
 
         public async Task<bool> UpdateUser(int id, UserDto userEdited)
         {
-            if (userEdited == null || userEdited.Id != id)
-                throw new Exception("information is null or the id is deffrinet");
-
-            //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
-            //if (user2 == null)
-            //    throw new Exception("User not found");
-
-            User user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                throw new Exception("User not found");
-            }
+                if (userEdited == null || userEdited.Id != id)
+                    throw new Exception("information is null or the id is deffrinet");
 
-            // update need a special map, copy the userEdited to user and save the other attribuits on user
-            _mapper.Map(userEdited, user);
-            _context.Users.Update(user);
-            await _context.SaveChangesAsync();
-            return true;
+                //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
+                //if (user2 == null)
+                //    throw new Exception("User not found");
+
+                User user = await _context.Users.FindAsync(id);
+                if (user == null)
+                {
+                    throw new Exception("User not found");
+                }
+
+                // update need a special map, copy the userEdited to user and save the other attribuits on user
+                _mapper.Map(userEdited, user);
+                _context.Users.Update(user);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log or handle the exception as needed
+                Console.WriteLine($"Error updating user: {ex.Message}");
+                return false; // Indicate that the operation failed
+            }
         }
 
-        public async Task<UsersIndexDto> GetAllUsers(UsersIndexDto? usersIndexDto = null)
+        public async Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null)
         {
+            UsersIndexDto usersIndexDto = new UsersIndexDto();
+            if (SearchTerm != null)
+                usersIndexDto.SearchTerm = SearchTerm;
+
             if (usersIndexDto != null && !string.IsNullOrEmpty(usersIndexDto.SearchTerm))
             {
                 //IQueryable<User> users = _context.Users.AsNoTracking();
@@ -181,10 +203,11 @@ namespace JustCare_MB.Services
         {
             if (id == 0)
                 throw new Exception("id cant be 0");
-            if (_context.Users == null)
-                throw new Exception("Users cant be null");
-
+            
             User user = await _context.Users.FirstAsync(e => e.Id == id);
+            if (user == null)
+                throw new Exception("User is null"); 
+
             return user;
         }
 
@@ -196,14 +219,17 @@ namespace JustCare_MB.Services
         }
 
 
-        public async Task<bool> DeleteUser(int id)
+        public async Task DeleteUser(int id)
         {
             if (id == 0)
                 throw new Exception("id cant be 0");
+
             User user = await _context.Users.FirstAsync(x => x.Id == id);
+            if (user == null)
+                throw new Exception("User is null");
+
             _context.Users.Remove(user);
             _context.SaveChanges();
-            return true;
         }
     }
 }
