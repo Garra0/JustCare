@@ -26,16 +26,8 @@ namespace JustCareAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Login([FromBody] UserLogin userLogin)
         {
-            try
-            {
-                string token = await _userService.Login(userLogin);
-                return Ok(token);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
+            string token = await _userService.Login(userLogin);
+            return Ok(token);
         }
 
 
@@ -54,17 +46,8 @@ namespace JustCareAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateUser(UserRegisterDto userRegisterDto)
         {
-            try
-            {
-                await _userService.CreateUser(userRegisterDto);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-
+            await _userService.CreateUser(userRegisterDto);
+            return Ok();
         }
 
         [HttpGet]
@@ -75,17 +58,8 @@ namespace JustCareAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUser(string? SearchTerm = null)
         {
-            try
-            {
-                UsersIndexDto usersIndex = await _userService.GetAllUsers(SearchTerm);
-                return Ok(usersIndex.Users);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-
-
+            UsersIndexDto usersIndex = await _userService.GetAllUsers(SearchTerm);
+            return Ok(usersIndex.Users);
         }
 
         [HttpGet("{id:int}", Name = "GetUser")]
@@ -94,17 +68,8 @@ namespace JustCareAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<User>> GetUserById(int id)
         {
-            try
-            {
-                User user = await _userService.GetUserById(id);
-                return Ok(user);
-            }
-            catch (Exception ex)
-            {
-                if(ex.Message== "id cant be 0")
-                    return BadRequest(ex.Message);
-                return NotFound(ex.Message);
-            }
+            User user = await _userService.GetUserById(id);
+            return Ok(user);
         }
 
 
@@ -114,35 +79,15 @@ namespace JustCareAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteUser(int id)
         {
-            try
-            {
-                await _userService.DeleteUser(id);
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "id cant be 0")
-                    return BadRequest(ex.Message);
-                return NotFound(ex.Message);
-            }
-
+            await _userService.DeleteUser(id);
+            return Ok();
         }
 
         [HttpPut("{id:int}", Name = "UpdateVilla")]
         public async Task<ActionResult> UpdateUser(int id, UserDto userEdited)
         {
-            try
-            {
                 await _userService.UpdateUser(id, userEdited);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "id cant be 0")
-                    return BadRequest(ex.Message);
-                return NotFound(ex.Message);
-            }
-
         }
 
         //For Dentist Only

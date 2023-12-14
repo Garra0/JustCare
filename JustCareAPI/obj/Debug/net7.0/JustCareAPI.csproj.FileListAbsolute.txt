@@ -76,3 +76,4 @@ C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\JustCare_MB.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\JustCare_MB.pdb
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Newtonsoft.Json.dll

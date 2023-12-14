@@ -67,3 +67,6 @@ C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\obj\Debug\net7.0\JustCare_MB.pdb
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\obj\Debug\net7.0\JustCare_MB.genruntimeconfig.cache
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\obj\Debug\net7.0\ref\JustCare_MB.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\AutoMapper.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\Microsoft.AspNetCore.Http.Features.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\Newtonsoft.Json.dll

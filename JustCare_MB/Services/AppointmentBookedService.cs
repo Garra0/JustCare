@@ -28,9 +28,9 @@ namespace JustCare_MB.Services
         }
         private async Task<DatesDto> GetAllAvailableAppointmentByCategoryId(int Categoryid)
         {
-            if (_context.Categories == null)
-                throw new Exception("Categories is null");
-            Category catName = await _context.Categories.FirstAsync(e => e.Id == Categoryid);
+            //if (_context.Categories == null)
+            //    throw new Exception("Categories is null");
+            Category catName = await _context.Categories.FirstOrDefaultAsync(e => e.Id == Categoryid);
             if (catName == null)
                 throw new Exception("There are no Category by this Category");
             //1-

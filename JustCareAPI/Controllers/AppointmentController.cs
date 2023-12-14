@@ -1,6 +1,7 @@
 ﻿using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Models;
+using JustCare_MB.Services;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -23,8 +24,23 @@ namespace JustCareAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
         {
+            //try
+            //{
+            //    IEnumerable<AppointmentDto> appointmentDtos = await _appointmentService.GetAllAppointments();
+            //    return appointmentDtos;
+            //    await _userService.UpdateUser(id, userEdited);
+            //    return Ok();
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (ex.Message == "id cant be 0")
+            //        return BadRequest(ex.Message);
+            //    return NotFound(ex.Message);
+            //}
+
             IEnumerable<AppointmentDto> appointmentDtos = await _appointmentService.GetAllAppointments();
             return appointmentDtos;
+
 
         }
 

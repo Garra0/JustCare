@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
 using JustCare_MB.Dtos;
+using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
@@ -28,14 +29,13 @@ namespace JustCare_MB.Services
         //To authenticate user
         private User Authenticate(UserLogin userLogin)
         {
-            // email and password
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
                 userLogin.Email.ToLower());
             if (currentUser == null)
-                throw new Exception("this Email not exist");
+                throw new NotFoundException("User not exist");// notfound
 
             if (currentUser.Password != userLogin.Password)
-                throw new Exception("Invalid password");
+                throw new InvalidUserPasswordException("Invalid Password"); // bad request
 
             return currentUser;
         }
@@ -76,41 +76,24 @@ namespace JustCare_MB.Services
 
         public async Task<string> Login(UserLogin userLogin)
         {
-            try
-            {
                 var user = Authenticate(userLogin);// user exist?
                 var token = await GenerateToken(user);
                 return token;
-            }
-            catch
-            (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
         }
-
-
 
 
         public async Task CreateUser(UserRegisterDto userRegister)
         {
-            try
-            {
                 if (userRegister == null)
-                    throw new Exception("null inputs");
-
+                    throw new EmptyFieldException("Empty field");
+                
                 if (_context.Users.Any(u => u.Email.ToLower()
                 == userRegister.Email.ToLower()))
-                    throw new Exception("Email exists");
+                    throw new ExistsException("Email is exists");
 
                 User user = _mapper.Map<User>(userRegister);
                 await _context.Users.AddAsync(user);
                 await _context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
-            }
         }
 
         //public async Task<bool> Register(UserRegisterDto userRegisterDto)
@@ -134,12 +117,12 @@ namespace JustCare_MB.Services
         //    return true;
         //}
 
-        public async Task<bool> UpdateUser(int id, UserDto userEdited)
+        public async Task UpdateUser(int id, UserDto userEdited)
         {
-            try
-            {
-                if (userEdited == null || userEdited.Id != id)
-                    throw new Exception("information is null or the id is deffrinet");
+                if (userEdited == null)
+                    throw new EmptyFieldException("Empty Field");
+                if(userEdited.Id != id)
+                    throw new InvalidIdException("Id is null or the Ids are diffrenete");
 
                 //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
                 //if (user2 == null)
@@ -147,22 +130,13 @@ namespace JustCare_MB.Services
 
                 User user = await _context.Users.FindAsync(id);
                 if (user == null)
-                {
-                    throw new Exception("User not found");
-                }
+                    throw new NotFoundException("User not found");
+                
 
                 // update need a special map, copy the userEdited to user and save the other attribuits on user
                 _mapper.Map(userEdited, user);
                 _context.Users.Update(user);
                 await _context.SaveChangesAsync();
-                return true;
-            }
-            catch (Exception ex)
-            {
-                // Log or handle the exception as needed
-                Console.WriteLine($"Error updating user: {ex.Message}");
-                return false; // Indicate that the operation failed
-            }
         }
 
         public async Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null)
@@ -196,18 +170,16 @@ namespace JustCare_MB.Services
                 usersIndexDto.Users = _mapper.Map<List<UserDto>>(await _context.Users.ToListAsync());
                 return usersIndexDto;
             }
-
         }
 
         public async Task<User> GetUserById(int id)
         {
             if (id == 0)
-                throw new Exception("id cant be 0");
+                throw new InvalidIdException("id cant be 0");
             
             User user = await _context.Users.FirstAsync(e => e.Id == id);
             if (user == null)
-                throw new Exception("User is null"); 
-
+                throw new NotFoundException("User is null"); 
             return user;
         }
 
@@ -222,11 +194,11 @@ namespace JustCare_MB.Services
         public async Task DeleteUser(int id)
         {
             if (id == 0)
-                throw new Exception("id cant be 0");
+                throw new InvalidIdException("id cant be 0");
 
             User user = await _context.Users.FirstAsync(x => x.Id == id);
             if (user == null)
-                throw new Exception("User is null");
+                throw new NotFoundException("User is null");
 
             _context.Users.Remove(user);
             _context.SaveChanges();

@@ -1,8 +1,10 @@
 using JustCare_MB;
 using JustCare_MB.Data;
+using JustCare_MB.Middlewares;
 using JustCare_MB.Services;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -28,7 +30,6 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IAppointmentBookedService, AppointmentBookedService>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
-
 
 
 
@@ -82,6 +83,9 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -98,5 +102,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.Run();
