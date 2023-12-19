@@ -2,6 +2,7 @@
 using JustCare_MB.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.SqlServer.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace JustCare_MB.Middlewares
                 await next(context);
                 flag = false;
             }
-            catch (InvalidUserPasswordException ex)
+            catch (InvalidUserPasswordOrUserNotExistException ex)
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.StatusCode
@@ -77,6 +78,19 @@ namespace JustCare_MB.Middlewares
                 problem = new()
                 {
                     Status = (int)HttpStatusCode.Conflict,
+                    Type = ex.Message,
+                    Title = ex.Message,
+                    Detail = string.Format("a {0} Error", ex.Message)
+                };
+            }
+            catch (InvalidIdException ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                context.Response.StatusCode
+                    = (int)HttpStatusCode.BadRequest;
+                problem = new()
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
                     Type = ex.Message,
                     Title = ex.Message,
                     Detail = string.Format("a {0} Error", ex.Message)

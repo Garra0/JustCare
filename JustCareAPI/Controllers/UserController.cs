@@ -31,22 +31,13 @@ namespace JustCareAPI.Controllers
         }
 
 
-
-        //[HttpPost("Register")]
-        //public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
-        //{
-        //    bool isSuccess = await _userService.Register(userRegisterDto);
-        //    if (isSuccess == false)
-        //        return BadRequest();
-        //    return Ok();
-        //}
         [AllowAnonymous]
-        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateUser(UserRegisterDto userRegisterDto)
+        [HttpPost("Register")]
+        public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
         {
-            await _userService.CreateUser(userRegisterDto);
+            await _userService.Register(userRegisterDto);
             return Ok();
         }
 
@@ -56,7 +47,7 @@ namespace JustCareAPI.Controllers
         // [ProducesResponseType(StatusCodes.Status403Forbidden)] the other user cant see the fun..
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUser(string? SearchTerm = null)
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers(string? SearchTerm = null)
         {
             UsersIndexDto usersIndex = await _userService.GetAllUsers(SearchTerm);
             return Ok(usersIndex.Users);

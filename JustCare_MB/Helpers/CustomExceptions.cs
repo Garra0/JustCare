@@ -9,10 +9,10 @@ namespace JustCare_MB.Helpers;
 //{
 //}
 
-public class InvalidUserPasswordException : Exception
+public class InvalidUserPasswordOrUserNotExistException : Exception
 {
-    public InvalidUserPasswordException() { }
-    public InvalidUserPasswordException(string Password)
+    public InvalidUserPasswordOrUserNotExistException() { }
+    public InvalidUserPasswordOrUserNotExistException(string Password)
         : base(String.Format(Password)) { }
 }
 

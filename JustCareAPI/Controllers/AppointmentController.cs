@@ -24,32 +24,9 @@ namespace JustCareAPI.Controllers
         [HttpGet]
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
         {
-            //try
-            //{
-            //    IEnumerable<AppointmentDto> appointmentDtos = await _appointmentService.GetAllAppointments();
-            //    return appointmentDtos;
-            //    await _userService.UpdateUser(id, userEdited);
-            //    return Ok();
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (ex.Message == "id cant be 0")
-            //        return BadRequest(ex.Message);
-            //    return NotFound(ex.Message);
-            //}
-
             IEnumerable<AppointmentDto> appointmentDtos = await _appointmentService.GetAllAppointments();
             return appointmentDtos;
-
-
         }
-
-        //[HttpGet("{id:int}", Name = "GetAppointment")]
-        //public async Task<User> GetAppointment(int id)
-        //{
-        //    User user = await _userService.GetUserById(id);
-        //    return user;
-        //}
 
         [HttpPost]
         public async Task<ActionResult> CreateAppointment(CreateAppointmentDto appointmentDto)
@@ -95,16 +72,18 @@ namespace JustCareAPI.Controllers
             AppointmentList = await _appointmentService.GetAllAppointments();
             return Ok(AppointmentList);
         }
+
+        public async Task<IActionResult> AcceptBooking()
+        {
+            return View(await _appointmentService.AllWaitingApprovalAppointments());
+        }
+        public async Task<IActionResult> Accepted_Rejected(int id, string status)
+        {
+            await _appointmentService.AppointmentStatus(id, status);
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
 
 
-//public async Task<IActionResult> AcceptBooking()
-//{
-//    return View(await _appointmentService.AllWaitingApprovalAppointments());
-//}
-//public async Task<IActionResult> Accepted_Rejected(int id, string status)
-//{
-//    await _appointmentService.AppointmentStatus(id, status);
-//    return RedirectToAction(nameof(Index));
-//}
+

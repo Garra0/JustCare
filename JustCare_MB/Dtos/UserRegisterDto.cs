@@ -42,8 +42,8 @@ namespace JustCare_MB.Dtos
 
 
         // UserType
-        [Required]
-        public int UserTypeId { get; set; }
+        //[Required]
+        //public int UserTypeId { get; set; }
         //public UserType UserType { get; set; }
         // Gender
         [Required]

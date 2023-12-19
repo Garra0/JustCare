@@ -31,11 +31,9 @@ namespace JustCare_MB.Services
         {
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
                 userLogin.Email.ToLower());
-            if (currentUser == null)
-                throw new NotFoundException("User not exist");// notfound
-
-            if (currentUser.Password != userLogin.Password)
-                throw new InvalidUserPasswordException("Invalid Password"); // bad request
+            if (currentUser == null
+                || currentUser.Password != userLogin.Password)
+                throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
 
             return currentUser;
         }
@@ -76,67 +74,54 @@ namespace JustCare_MB.Services
 
         public async Task<string> Login(UserLogin userLogin)
         {
-                var user = Authenticate(userLogin);// user exist?
-                var token = await GenerateToken(user);
-                return token;
+            var user = Authenticate(userLogin);// user exist?
+            var token = await GenerateToken(user);
+            return token;
         }
 
-
-        public async Task CreateUser(UserRegisterDto userRegister)
+        public async Task Register(UserRegisterDto userRegisterDto)
         {
-                if (userRegister == null)
-                    throw new EmptyFieldException("Empty field");
-                
-                if (_context.Users.Any(u => u.Email.ToLower()
-                == userRegister.Email.ToLower()))
-                    throw new ExistsException("Email is exists");
+            if (userRegisterDto == null)
+                throw new EmptyFieldException("Empty field");
 
-                User user = _mapper.Map<User>(userRegister);
-                await _context.Users.AddAsync(user);
-                await _context.SaveChangesAsync();
+            if (_context.Users.Any(u => u.Email.ToLower()
+            == userRegisterDto.Email.ToLower()))
+                throw new ExistsException("Email is exists");
+
+            User user = _mapper.Map<User>(userRegisterDto);
+
+            if (user.Email.ToLower().Contains("den.just.edu.jo"))
+                user.UserTypeId = 1;
+            else
+                user.UserTypeId = 2;
+            // remove the spaces before and after the string:
+            // "  hello word  ".Trim() will be => "hello word"
+            //user.Email = user.Email.Trim(); but i have RegularExpression
+
+            await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
         }
-
-        //public async Task<bool> Register(UserRegisterDto userRegisterDto)
-        //{
-        //    if (_context.Users.Any(u => u.Email.ToLower() == userRegisterDto.Email.ToLower()))
-        //        throw new Exception("user Exists");
-
-        //    ApplicationUser user = new()
-        //    {
-        //        FullName = userRegisterDto.FullName,
-        //        Email = userRegisterDto.Email,
-        //       // PhoneNumber = userRegisterDto.PhoneNumber,
-        //        Age = userRegisterDto.Age,
-        //        NationalId = userRegisterDto.NationalId,
-        //        UserTypeId = userRegisterDto.UserTypeId,
-        //        GenderId = userRegisterDto.GenderId,
-        //    };
-
-        //    var result = await _userManager.CreateAsync(user, userRegisterDto.Password);
-
-        //    return true;
-        //}
 
         public async Task UpdateUser(int id, UserDto userEdited)
         {
-                if (userEdited == null)
-                    throw new EmptyFieldException("Empty Field");
-                if(userEdited.Id != id)
-                    throw new InvalidIdException("Id is null or the Ids are diffrenete");
+            if (userEdited == null)
+                throw new EmptyFieldException("Empty Field");
+            if (userEdited.Id != id)
+                throw new InvalidIdException("Id is null or the Ids are diffrenete");
 
-                //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
-                //if (user2 == null)
-                //    throw new Exception("User not found");
+            //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
+            //if (user2 == null)
+            //    throw new Exception("User not found");
 
-                User user = await _context.Users.FindAsync(id);
-                if (user == null)
-                    throw new NotFoundException("User not found");
-                
+            User? user = await _context.Users.FindAsync(id);
+            if (user == null)
+                throw new NotFoundException("User not found");
 
-                // update need a special map, copy the userEdited to user and save the other attribuits on user
-                _mapper.Map(userEdited, user);
-                _context.Users.Update(user);
-                await _context.SaveChangesAsync();
+
+            // update need a special map, copy the userEdited to user and save the other attribuits on user
+            _mapper.Map(userEdited, user);
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null)
@@ -160,6 +145,9 @@ namespace JustCare_MB.Services
                     || s.Email.ToLower().
                     Contains(usersIndexDto.SearchTerm.ToLower()));
                 }
+                
+                if (!users.Any())
+                    throw new NotFoundException("Users have not this key");
                 usersIndexDto.Users = _mapper.Map<List<UserDto>>(users);
                 return usersIndexDto;
             }
@@ -174,29 +162,21 @@ namespace JustCare_MB.Services
 
         public async Task<User> GetUserById(int id)
         {
-            if (id == 0)
-                throw new InvalidIdException("id cant be 0");
-            
-            User user = await _context.Users.FirstAsync(e => e.Id == id);
+            if (id < 1)
+                throw new InvalidIdException("id cant be less than 1");
+
+            User? user = await _context.Users.FindAsync(id);
             if (user == null)
-                throw new NotFoundException("User is null"); 
+                throw new NotFoundException("User is null");
             return user;
         }
 
-        public async Task<UserDto> UserToUserDtoMapper(int id)
-        {
-            User user = await GetUserById(id);
-            UserDto UserUpdateDto = _mapper.Map<User, UserDto>(user);
-            return UserUpdateDto;
-        }
-
-
         public async Task DeleteUser(int id)
         {
-            if (id == 0)
+            if (id < 1)
                 throw new InvalidIdException("id cant be 0");
 
-            User user = await _context.Users.FirstAsync(x => x.Id == id);
+            User? user = await _context.Users.FindAsync(id);
             if (user == null)
                 throw new NotFoundException("User is null");
 
@@ -205,3 +185,4 @@ namespace JustCare_MB.Services
         }
     }
 }
+
