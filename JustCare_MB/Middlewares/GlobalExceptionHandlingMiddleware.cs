@@ -82,6 +82,7 @@ namespace JustCare_MB.Middlewares
                     Title = ex.Message,
                     Detail = string.Format("a {0} Error", ex.Message)
                 };
+
             }
             catch (InvalidIdException ex)
             {
@@ -96,9 +97,23 @@ namespace JustCare_MB.Middlewares
                     Detail = string.Format("a {0} Error", ex.Message)
                 };
             }
+            catch (TimeNotValid ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                context.Response.StatusCode
+                    = (int)HttpStatusCode.BadRequest;
+                problem = new()
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Type = ex.Message,
+                    Title = ex.Message,
+                    Detail = string.Format("a {0} Error", ex.Message)
+                };
+            }
             catch (Exception ex)
             {
-//context.Response.StatusCode
+                _logger.LogError(ex, ex.Message);
+                //context.Response.StatusCode
                 //    = (int)HttpStatusCode.InternalServerError;
 
                 //ProblemDetails problem = new()
@@ -114,9 +129,18 @@ namespace JustCare_MB.Middlewares
             {
                 if (flag)
                 {
+                    //var problemJson = JsonConvert.SerializeObject(problem);
+                    //// Set the response content type to JSON
+                    //context.Response.ContentType = "application/json";
+                    //// Write the serialized problem object to the response body
+                    //await context.Response.WriteAsync(problemJson);
+
                     string json = JsonSerializer.Serialize(problem);
-                    await context.Response.WriteAsync(json);
+                    // Set the response content type to JSON
                     context.Response.ContentType = "application/json";
+                    // Write the serialized problem object to the response body
+                    await context.Response.WriteAsync(json);
+
                 }
             }
         }

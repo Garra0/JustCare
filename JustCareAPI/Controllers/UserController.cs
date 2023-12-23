@@ -3,6 +3,7 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace JustCareAPI.Controllers
@@ -17,6 +18,13 @@ namespace JustCareAPI.Controllers
         {
             _userService = usersService;
         }
+        //[HttpGet("GetIdByToken")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //public async Task<ActionResult> GetIdByToken(string token)
+        //{
+        //    int id = await _userService.GetIdByToken(token);
+        //    return Ok(id);
+        //}
 
         // [AllowAnonymous] mean all users can see this function
         // (all users who have not been authenticated)
@@ -81,29 +89,29 @@ namespace JustCareAPI.Controllers
                 return Ok();
         }
 
-        //For Dentist Only
-        [HttpGet]
-        [Route("Dentists")]
-        [Authorize(Roles = "Dentist")]
-        public IActionResult AdminEndPoint()
-        {
-            UserRole currentUser = GetCurrentUser();
-            return Ok($"Hi you are an {currentUser.Role}");
-        }
-        private UserRole GetCurrentUser()
-        {
-            var identity = HttpContext.User.Identity as ClaimsIdentity;
-            if (identity != null)
-            {
-                var userClaims = identity.Claims;
-                return new UserRole
-                {
-                    UserName = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value,
-                    Role = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value
-                };
-            }
-            return null;
-        }
+        ////For Dentist Only
+        //[HttpGet]
+        //[Route("Dentists")]
+        //[Authorize(Roles = "Dentist")]
+        //public IActionResult AdminEndPoint()
+        //{
+        //    UserRole currentUser = GetCurrentUser();
+        //    return Ok($"Hi you are an {currentUser.Role}");
+        //}
+        //private UserRole GetCurrentUser()
+        //{
+        //    var identity = HttpContext.User.Identity as ClaimsIdentity;
+        //    if (identity != null)
+        //    {
+        //        var userClaims = identity.Claims;
+        //        return new UserRole
+        //        {
+        //            UserName = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value,
+        //            Role = userClaims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value
+        //        };
+        //    }
+        //    return null;
+        //}
 
     }
 }

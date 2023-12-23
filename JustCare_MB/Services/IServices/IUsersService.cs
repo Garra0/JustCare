@@ -11,5 +11,6 @@ namespace JustCare_MB.Services.IServices
         Task DeleteUser(int id);
         Task<User> GetUserById(int id); 
         Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null);
+        Task<int> GetUserIdByToken(string token);
     }
 }

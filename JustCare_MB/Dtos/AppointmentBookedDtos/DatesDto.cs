@@ -8,8 +8,8 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
 {
     public class DatesDto
     {
-        public int Id { get; set; }
-        public IEnumerable<AppointmentsDates> DateInformation { get; set; }
+        public int CategoryId { get; set; }
+        public IEnumerable<AppointmentDates> appointmentDates { get; set; }
         public string CategoryName { get; set; }
 
     }

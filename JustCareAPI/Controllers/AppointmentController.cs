@@ -1,4 +1,5 @@
 ﻿using JustCare_MB.Dtos;
+using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Models;
 using JustCare_MB.Services;
@@ -21,6 +22,22 @@ namespace JustCareAPI.Controllers
             _appointmentService = appointmentService;
         }
 
+        //2-
+        [HttpPost("Create appointment")]
+        public async Task<ActionResult> CreateAppointment(CreateAppointmentDto appointmentDto)
+        {
+            await _appointmentService.CreateAppointment(appointmentDto);
+            return Ok();
+        }
+        //4-
+        [HttpGet("{Categoryid:int}", Name = "GetAllDatesDtoByCategoryId")]
+        public async Task<IActionResult> GetAllDatesDtoByCategoryId(int Categoryid)
+        {
+            DatesDto AppoitnmentsDate = await _appointmentService.GetAllAppoitnmentDatesDtoByCategoryId(Categoryid);
+            return Ok(AppoitnmentsDate);
+        }
+
+
         [HttpGet]
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
         {
@@ -28,12 +45,7 @@ namespace JustCareAPI.Controllers
             return appointmentDtos;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> CreateAppointment(CreateAppointmentDto appointmentDto)
-        {
-            await _appointmentService.CreateAppointment(appointmentDto);
-            return Ok();
-        }
+        
 
         [HttpDelete("{id:int}")]
         public async Task<ActionResult> DeleteAppointment(int id)
@@ -53,17 +65,8 @@ namespace JustCareAPI.Controllers
             return Ok();
         }
 
-        [HttpGet("GetAllCategorys")]
-        public async Task<IActionResult> GetAllCategorys()
-        {
-            IEnumerable<Category> categories = await _appointmentService.GetAllCategories();
-            return Ok(categories);
-        }
-
-
         //Task<Category> getCategoryObject(int id);
         //Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);
-        //Task<IEnumerable<WaitingApprovalAppointmentsBooked>> AllWaitingApprovalAppointments();
 
         [HttpGet("MyAppointments")]
         public async Task<IActionResult> MyAppointments()
@@ -73,15 +76,15 @@ namespace JustCareAPI.Controllers
             return Ok(AppointmentList);
         }
 
-        public async Task<IActionResult> AcceptBooking()
-        {
-            return View(await _appointmentService.AllWaitingApprovalAppointments());
-        }
-        public async Task<IActionResult> Accepted_Rejected(int id, string status)
-        {
-            await _appointmentService.AppointmentStatus(id, status);
-            return RedirectToAction(nameof(Index));
-        }
+        //public async Task<IActionResult> AcceptBooking()
+        //{
+        //    return View(await _appointmentService.AllWaitingApprovalAppointments());
+        //}
+        //public async Task<IActionResult> Accepted_Rejected(int id, string status)
+        //{
+        //    await _appointmentService.AppointmentStatus(id, status);
+        //    return RedirectToAction(nameof(Index));
+        //}
     }
 }
 

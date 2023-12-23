@@ -6,6 +6,7 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -57,8 +58,10 @@ namespace JustCare_MB.Services
 
             Claim[] claims = new[]
             {
+                // i can get these 3 lines , the key on the left and the value on the right
                 new Claim(ClaimTypes.NameIdentifier,user.Email),
-                new Claim(ClaimTypes.Role,UserRole)
+                new Claim(ClaimTypes.Role,UserRole),
+                new Claim("Id",user.Id.ToString())
             };
 
             var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
@@ -81,10 +84,10 @@ namespace JustCare_MB.Services
 
         public async Task Register(UserRegisterDto userRegisterDto)
         {
-            if (userRegisterDto == null)
-                throw new EmptyFieldException("Empty field");
+            //if (userRegisterDto == null)
+            //    throw new EmptyFieldException("Empty field");
 
-            if (_context.Users.Any(u => u.Email.ToLower()
+            if (await _context.Users.AnyAsync(u => u.Email.ToLower()
             == userRegisterDto.Email.ToLower()))
                 throw new ExistsException("Email is exists");
 
@@ -104,11 +107,12 @@ namespace JustCare_MB.Services
 
         public async Task UpdateUser(int id, UserDto userEdited)
         {
-            if (userEdited == null)
-                throw new EmptyFieldException("Empty Field");
+            //if (userEdited == null)
+            //    throw new EmptyFieldException("Empty Field");
             if (userEdited.Id != id)
                 throw new InvalidIdException("Id is null or the Ids are diffrenete");
-
+            if (!await _context.Users.AnyAsync(x => x.Id == id))
+                throw new InvalidIdException("id is not exist");
             //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
             //if (user2 == null)
             //    throw new Exception("User not found");
@@ -146,7 +150,7 @@ namespace JustCare_MB.Services
                     Contains(usersIndexDto.SearchTerm.ToLower()));
                 }
                 
-                if (!users.Any())
+                if (!await users.AnyAsync())
                     throw new NotFoundException("Users have not this key");
                 usersIndexDto.Users = _mapper.Map<List<UserDto>>(users);
                 return usersIndexDto;
@@ -160,10 +164,31 @@ namespace JustCare_MB.Services
             }
         }
 
+
+
+        public async Task<int> GetUserIdByToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jsonToken != null)
+            {
+                // Retrieve user ID from the "sub" claim
+                int userId =int.Parse(jsonToken
+                    .Claims.First(claim => claim.Type == "Id").Value);
+
+                return userId;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
         public async Task<User> GetUserById(int id)
         {
-            if (id < 1)
-                throw new InvalidIdException("id cant be less than 1");
+            if (!await _context.Users.AnyAsync(x=>x.Id==id))
+                throw new InvalidIdException("id is not exist");
 
             User? user = await _context.Users.FindAsync(id);
             if (user == null)
@@ -172,9 +197,9 @@ namespace JustCare_MB.Services
         }
 
         public async Task DeleteUser(int id)
-        {
-            if (id < 1)
-                throw new InvalidIdException("id cant be 0");
+        {   
+            if (!await _context.Users.AnyAsync(x => x.Id == id))
+                throw new InvalidIdException("id is not exist");
 
             User? user = await _context.Users.FindAsync(id);
             if (user == null)

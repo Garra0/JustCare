@@ -29,6 +29,7 @@ builder.Services.AddDbContext<JustCareContext>(options =>
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IAppointmentBookedService, AppointmentBookedService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 

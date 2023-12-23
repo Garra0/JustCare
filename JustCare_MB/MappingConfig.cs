@@ -2,6 +2,7 @@
 using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
+using JustCare_MB.Dtos.Category;
 using JustCare_MB.Models;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,8 @@ namespace JustCare_MB
             CreateMap<UserDto, User>().ReverseMap();
             CreateMap<WaitingApprovalAppointmentsBooked, AppointmentBooked>().ReverseMap();
             CreateMap<UpdateAppointmentDto, Appointment>().ReverseMap();
-        }
+            CreateMap<CreateAppointmentDto, Appointment>().ReverseMap();
+            }
 
     }
 }

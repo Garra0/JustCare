@@ -1,5 +1,7 @@
 ﻿using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
+using JustCare_MB.Dtos.AppointmentDtos;
+using JustCare_MB.Dtos.Category;
 using JustCare_MB.Models;
 
 namespace JustCare_MB.Services.IServices
@@ -8,11 +10,13 @@ namespace JustCare_MB.Services.IServices
     {
         //AppointmentBooked AppointmentBookedDtoToAppointmentBooked(AppointmentBookedDto appointmentBookedDto);
         Task CreateAppointmentBooked(CreateAppointmentBookedDto appointmentBookedDto);
+        Task<IEnumerable<WaitingApprovalAppointmentsBooked>> GetAllWaitingApprovalAppointments();
+        Task AppointmentBookedAccepted(int AppointmentBookedId);
+        Task AppointmentBookedRejected(int AppointmentBookedId);
         Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto);
         Task<bool> DeleteAppointmentBooked(int appointmentBookedDtoId);
-        Task<IEnumerable<CategoryDto>> GetAllCategories();
-        Task<DatesDto> GetAllDatesDtoByCategoryId(int id);
-        Task<CreateAppointmentBookedDto> CreateAppointmentBookedDtoAsync(int id);
+        //Task<IEnumerable<CategoryDto>> GetAllCategories();
+        Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int id);
         Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken();
  }
 }

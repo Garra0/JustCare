@@ -1,5 +1,6 @@
 ﻿using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
+using JustCare_MB.Dtos.Category;
 using JustCare_MB.Models;
 using JustCare_MB.Services;
 using JustCare_MB.Services.IServices;
@@ -33,7 +34,7 @@ namespace LoadTheDb.Controllers
         {
             // from AppointmentId i can get 
             // 1- CategoryName  2- Date of the appointment
-            CreateAppointmentBookedDto dto = await _appointmentBookedService.CreateAppointmentBookedDtoAsync(AppointmentId);
+            CreateAppointmentBookedDto dto = await _appointmentBookedService.CreateAppointmentBookedDto(AppointmentId);
             return View(dto);
         }
         [HttpPost]

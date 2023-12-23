@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using JustCare_MB.Data;
+using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
+using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -19,53 +23,82 @@ namespace JustCare_MB.Services
             _mapper = mapper;
         }
 
-        public async Task<Appointment> AppointmentDtoToappointment(CreateAppointmentDto appointmentDto)
-        {
-            Appointment appointment = new Appointment
-            {
-                Date = appointmentDto.Date,
-                DentistUserId = appointmentDto.DentistUserId.Value,
-                CategoryId = appointmentDto.CategoryId
-            };
-            return appointment;
-        }
-
+        //2-
         public async Task CreateAppointment(CreateAppointmentDto appointmentDto)
         {
-            appointmentDto.DentistUserId = 10;
+            appointmentDto.DentistUserId = 13;
+            // appointment not Exists?
             if (await _context.Appointments.AnyAsync(u => u.Date == appointmentDto.Date)
                 && await _context.Appointments.AnyAsync(u => u.DentistUserId == appointmentDto.DentistUserId))
-                throw new Exception("appointment Exists");
+                throw new ExistsException("Appointment Exists");
 
-            //if (await _context.Users.FindAsync(appointmentDto.DentistUserId) == null)
-            //    throw new Exception("DentistUserId not Exists");
+            // the appointment should be after 12h at least
+            if(appointmentDto.Date<DateTime.Now.AddHours(12))
+                throw new TimeNotValid("The appointment must be at least 12 hours away");
 
-            Appointment appointment = await AppointmentDtoToappointment(appointmentDto);
+            Appointment appointment = _mapper.Map<Appointment>(appointmentDto);
             await _context.Appointments.AddAsync(appointment);
             _context.SaveChanges();
-
         }
 
-        public async Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id)
+        //4.1-
+        public async Task<DatesDto> GetAllAppoitnmentDatesDtoByCategoryId(int Categoryid)
         {
-            // fill the objects
+            if (! await _context.Categories.AnyAsync(x => x.Id == Categoryid))
+                throw new InvalidIdException("id is not exist");
+            
+            if (!await _context.Appointments.AnyAsync())
+                throw new NotFoundException("There are no appointments");
+            
+            DatesDto datesDto = await GetAllAvailableAppointmentByCategoryId(Categoryid);
+            return datesDto;
+        }
+
+        //4.2
+        private async Task<DatesDto> GetAllAvailableAppointmentByCategoryId(int CategoryId)
+        {
+            // all appoitnments - appoitnmentsbooked - other categories
+            IEnumerable<AppointmentDates> Dates
+            = await _context.Appointments.
+            // dont select the appoitnments witch are on AppointmentBooked table
+            Where(e => e.Id != e.AppointmentBooked.AppointmentId
+            && e.CategoryId == CategoryId)
+            .Select(e => new AppointmentDates { AppointmentId = e.Id, Date = e.Date }).OrderBy(e => e.Date)
+            .ToListAsync();
+
+            if (Dates == null)
+                throw new NotFoundException("There are no Appointments by this Category");
+
+            string CategoryName = await _context.Categories
+                .Where(e => e.Id == CategoryId)
+                .Select(x => x.ArabicName).FirstAsync();
+
+            DatesDto dto = new DatesDto();
+            dto.CategoryId = CategoryId;
+            dto.CategoryName = CategoryName;
+            dto.appointmentDates = Dates;
+
+            return dto;
+        }
+
+
+
+        public async Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int CategorId)
+        {
             CreateAppointmentDto createAppointmentDto = new CreateAppointmentDto();
             string CategoryName = await _context.Categories.
-                Where(u => u.Id == id).Select(e => e.ArabicName).
+                Where(u => u.Id == CategorId).Select(e => e.ArabicName).
                 FirstAsync();
             createAppointmentDto.CategoryName = CategoryName;
-            createAppointmentDto.CategoryId = id;
+            createAppointmentDto.CategoryId = CategorId;
             return createAppointmentDto;
         }
-        public async Task<Category> getCategoryObject(int id)
-        {
-            Category category = await _context.Categories.
-                FirstAsync(c => c.Id == id);
-            return category;
-        }
+       
 
         public async Task<bool> DeleteAppointment(int id)
         {
+            //if (!_context.Categories.Any(x => x.Id == CategorId))
+            //    throw new InvalidIdException("id is not exist");
             if (id == 0)
                 return false;
             var appointment = await _context.Appointments.FirstOrDefaultAsync(x => x.Id == id);
@@ -96,15 +129,6 @@ namespace JustCare_MB.Services
 
         }
 
-        public async Task<IEnumerable<Category>> GetAllCategories()
-        {
-            if (_context.Categories == null)
-                throw new Exception("Categories table is null");
-            IEnumerable<Category> categories;
-            categories = await _context.Categories.ToListAsync();
-            return categories;
-        }
-
         public async Task UpdateAppointment(int id,UpdateAppointmentDto updateAppointmentDto)
         {
             if (updateAppointmentDto == null || updateAppointmentDto.Id != id)
@@ -118,111 +142,6 @@ namespace JustCare_MB.Services
             
             _mapper.Map(updateAppointmentDto, appointment);
             _context.Appointments.Update(appointment);
-            await _context.SaveChangesAsync();
-        }
-
-
-        public async Task<IEnumerable<WaitingApprovalAppointmentsBooked>> AllWaitingApprovalAppointments()
-        {
-            IEnumerable<WaitingApprovalAppointmentsBooked> waitingApprovalAppointmentsBooked =
-                await _context.AppointmentBookeds
-                .Where(x => x.Status != "Accepted")
-                .Where(e => e.PatientUserId == 10)
-                .Select(x => new WaitingApprovalAppointmentsBooked
-                {
-                    Image = x.Image,
-                    Note = x.Note,
-                    Status = x.Status,
-                    Date = x.Appointment.Date,
-                    PatientUser = new PatientUserDtoWaitingApprovalAppointments
-                    {
-                        Id = x.PatientUser.Id,
-                        PhoneNumber = x.PatientUser.PhoneNumber,
-                        Age = x.PatientUser.Age,
-                        NationalId = x.PatientUser.NationalId,
-                        UserType = x.PatientUser.UserType.ArabicType,
-                        Gender = x.PatientUser.Gender.ArabicType,
-                    },
-                    Category = new CategoryDtoWaitingApprovalAppointments
-                    {
-                        ArabicName = x.Appointment.Category.ArabicName
-                    }
-                }).OrderBy(e => e.Date).ToListAsync();
-
-            return waitingApprovalAppointmentsBooked;
-
-            // this include all columns , i can use "select" to chosee columns ...
-            //IEnumerable<AppointmentBooked> appointmentBooked = await _context.AppointmentBookeds
-            //    .Include(e=>e.PatientUser)
-            //    .Where(e=>e.PatientUserId==10)// --> from Token...
-            //    .Include(x=>x.Appointment)
-            //    .ThenInclude(x=>x.Category)
-            //        .Include(x => x.Appointment)
-            //        .ThenInclude(x=>x.DentistUser)
-            //    .Where(x => x.Status != "Accepted")
-            //    .ToListAsync();
-
-            //IEnumerable<WaitingApprovalAppointmentsBooked> acceptedAppointmentsList =
-            //    _mapper.Map<IEnumerable<WaitingApprovalAppointmentsBooked>>(appointmentBooked);
-
-
-            //foreach (var e in appointmentBooked)
-            //{
-            //var appointment = await _context.Appointments.
-            //    Include(e=>e.Category).
-            //    Include(e=>e.DentistUser).
-            //    FirstOrDefaultAsync(u => u.Id == e.AppointmentId);
-            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == e.PatientUserId);
-
-
-            //if (appointment == null)
-            //    throw new Exception("appointment is null");
-            //var category = await _context.Categories.FirstOrDefaultAsync(u => u.Id == appointment.CategoryId);
-
-            //if (category == null)
-            //    throw new Exception("category is null");
-            //appointment.Category = category;
-
-            //if (user == null)
-            //    throw new Exception("user is null");
-
-            //if (e.Status == "Accepted")
-            //    continue;
-
-            //    WaitingApprovalAppointments acceptedAppointment = new WaitingApprovalAppointments
-            //    {
-            //        Appointment = e.Appointment,
-            //        PatientUser = e.PatientUser,
-            //        Note = e.Note,
-            //        Image = e.Image,
-            //        Id = e.Id,
-            //    };
-
-            //    acceptedAppointmentsList.Add(acceptedAppointment);
-            //}
-        }
-
-
-        public async Task AppointmentStatus(int id, string status)
-        {
-            if (id == 0)
-                throw new Exception("id is 0");
-            AppointmentBooked appointmentBooked = await _context.AppointmentBookeds.FirstAsync(e => e.Id == id);
-
-            if (appointmentBooked == null)
-                throw new Exception("appointmentBooked is null");
-
-            //appointmentBooked.Status =  status == "Accepted" ?  "Accepted" :
-
-            if (status == "Accepted")
-            {
-                appointmentBooked.Status = "Accepted";
-                _context.AppointmentBookeds.Update(appointmentBooked);
-            }
-            else
-            {
-                _context.AppointmentBookeds.Remove(appointmentBooked);
-            }
             await _context.SaveChangesAsync();
         }
 

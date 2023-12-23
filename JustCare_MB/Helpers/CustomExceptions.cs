@@ -43,3 +43,11 @@ public class InvalidIdException : Exception
     public InvalidIdException(string invalidIdException)
         : base(String.Format(invalidIdException)) { }
 }
+
+public class TimeNotValid : Exception
+{
+    public TimeNotValid() { }
+    public TimeNotValid(string timeNotValid)
+        : base(String.Format(timeNotValid)) { }
+}
+

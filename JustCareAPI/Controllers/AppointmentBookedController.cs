@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Services;
 using Microsoft.AspNetCore.Authorization;
+using JustCare_MB.Dtos.Category;
 
 namespace JustCareAPI.Controllers
 {
@@ -32,27 +33,40 @@ namespace JustCareAPI.Controllers
             return Ok(AppointmentBookedList);
         }
 
-        [HttpGet("GetAllCategories")]
-        public async Task<IActionResult> GetAllCategories()
-        {
-            IEnumerable<CategoryDto> category = await _appointmentBookedService.GetAllCategories();
-            return Ok(category);
-        }
-
-
-        [HttpGet("{Categoryid:int}", Name = "GetAllDatesDtoByCategoryId")]
-        public async Task<IActionResult> GetAllDatesDtoByCategoryId(int Categoryid)
-        {
-            DatesDto AppoitnmentsDate = await _appointmentBookedService.GetAllDatesDtoByCategoryId(Categoryid);
-            return Ok(AppoitnmentsDate);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> CreateAppointmentBookedDtoAsync(CreateAppointmentBookedDto dto)
+        [HttpPost("CreateAppointmentBooked")]
+        public async Task<IActionResult> CreateAppointmentBookedDto(CreateAppointmentBookedDto dto)
         {
             await _appointmentBookedService.CreateAppointmentBooked(dto);
             return Ok();
         }
+
+        [HttpGet("GetAllWaitingApprovalAppointments")]
+        public async Task<ActionResult<IEnumerable<WaitingApprovalAppointmentsBooked>>> GetAllWaitingApprovalAppointments()
+        {
+            IEnumerable<WaitingApprovalAppointmentsBooked>
+                waitingApprovalAppointmentsBookeds
+                = await _appointmentBookedService.GetAllWaitingApprovalAppointments();
+
+            return Ok(waitingApprovalAppointmentsBookeds);
+        }
+
+        [HttpPost("AppointmentBooked Accepted")]
+        public async Task<IActionResult> AppointmentBookedAccepted(int appointmentBookedId)
+        {
+            await _appointmentBookedService.AppointmentBookedAccepted(appointmentBookedId);
+            return Ok();
+        }
+
+        [HttpPost("AppointmentBooked Rejected")]
+        public async Task<IActionResult> AppointmentBookedRejected(int appointmentBookedId)
+        {
+            await _appointmentBookedService.AppointmentBookedRejected(appointmentBookedId);
+            return Ok();
+        }
+
+
+
+
 
         //[HttpDelete("{id:int}")]
         //public Task<IActionResult> DeleteAppointmentBooked(int appointmentBookedDtoId)

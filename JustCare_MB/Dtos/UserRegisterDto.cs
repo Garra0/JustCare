@@ -27,7 +27,7 @@ namespace JustCare_MB.Dtos
         public string ConfirmationPassword { get; set; }
         [Required]
         [StringLength(100)]
-        [RegularExpression(@"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.")]
+        [RegularExpression(@"^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Invalid email address.\n Delete spaces before and after the email if there are some")]
         public string Email { get; set; }
         [Required]
         //https://www.regextester.com/99724 RegularExpression tester 
