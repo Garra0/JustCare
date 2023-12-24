@@ -85,7 +85,7 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
-
+builder.Services.AddCors();
 
 var app = builder.Build();
 
