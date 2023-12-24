@@ -85,8 +85,13 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
-builder.Services.AddCors();
-
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    });
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
