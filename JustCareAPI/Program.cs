@@ -4,7 +4,6 @@ using JustCare_MB.Middlewares;
 using JustCare_MB.Services;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -23,9 +22,21 @@ builder.Services.AddSwaggerGen();
 //builder.Services.AddSqlServer<JustCareContext>(sqlConnection, options =>
 //        options.EnableRetryOnFailure());
 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<JustCareContext>(options =>
         options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare3;Trusted_Connection=True;"));
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    });
+});
+
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 builder.Services.AddScoped<IAppointmentBookedService, AppointmentBookedService>();
@@ -33,8 +44,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 
-
-
+ 
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -85,13 +95,8 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
-    });
-});
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -101,7 +106,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseStaticFiles();
+
 app.UseHttpsRedirection();
+
+app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 

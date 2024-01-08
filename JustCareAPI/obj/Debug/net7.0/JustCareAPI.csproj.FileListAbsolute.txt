@@ -77,3 +77,17 @@ C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\JustCare_MB.pdb
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Newtonsoft.Json.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Web.Cors.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Net.Http.Formatting.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Web.Http.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Web.Http.Cors.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Newtonsoft.Json.Bson.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Configuration.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Hosting.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Options.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.Extensions.Primitives.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Diagnostics.DiagnosticSource.dll

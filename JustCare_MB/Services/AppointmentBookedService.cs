@@ -3,12 +3,10 @@ using JustCare_MB.Data;
 using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
-using JustCare_MB.Dtos.Category;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace JustCare_MB.Services
 {

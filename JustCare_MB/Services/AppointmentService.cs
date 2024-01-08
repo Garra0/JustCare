@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
-using Azure.Core;
 using JustCare_MB.Data;
-using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Helpers;
@@ -9,7 +7,7 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using static System.Net.Mime.MediaTypeNames;
+using System.Security.Claims;
 
 namespace JustCare_MB.Services
 {
@@ -17,24 +15,35 @@ namespace JustCare_MB.Services
     {
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
-        public AppointmentService(JustCareContext context, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AppointmentService(JustCareContext context
+            , IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         //2-
         public async Task CreateAppointment(CreateAppointmentDto appointmentDto)
         {
-            appointmentDto.DentistUserId = 13;
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (userIdClaim != null
+                && int.TryParse(userIdClaim.Value, out int userId))
+                appointmentDto.DentistUserId = userId;
+            else
+                throw new NotFoundException("The token invalid");
+
             // appointment not Exists?
             if (await _context.Appointments.AnyAsync(u => u.Date == appointmentDto.Date)
                 && await _context.Appointments.AnyAsync(u => u.DentistUserId == appointmentDto.DentistUserId))
                 throw new ExistsException("Appointment Exists");
 
             // the appointment should be after 12h at least
-            if(appointmentDto.Date<DateTime.Now.AddHours(12))
+            if (appointmentDto.Date < DateTime.Now.AddHours(12))
                 throw new TimeNotValid("The appointment must be at least 12 hours away");
+
+            
 
             Appointment appointment = _mapper.Map<Appointment>(appointmentDto);
             await _context.Appointments.AddAsync(appointment);
@@ -44,12 +53,12 @@ namespace JustCare_MB.Services
         //4.1-
         public async Task<DatesDto> GetAllAppoitnmentDatesDtoByCategoryId(int Categoryid)
         {
-            if (! await _context.Categories.AnyAsync(x => x.Id == Categoryid))
+            if (!await _context.Categories.AnyAsync(x => x.Id == Categoryid))
                 throw new InvalidIdException("id is not exist");
-            
+
             if (!await _context.Appointments.AnyAsync())
                 throw new NotFoundException("There are no appointments");
-            
+
             DatesDto datesDto = await GetAllAvailableAppointmentByCategoryId(Categoryid);
             return datesDto;
         }
@@ -93,7 +102,7 @@ namespace JustCare_MB.Services
             createAppointmentDto.CategoryId = CategorId;
             return createAppointmentDto;
         }
-       
+
 
         public async Task<bool> DeleteAppointment(int id)
         {
@@ -115,7 +124,7 @@ namespace JustCare_MB.Services
         {
             IEnumerable<AppointmentDto> appointmentDto =
                 await _context.Appointments
-                .Select(x=>new AppointmentDto
+                .Select(x => new AppointmentDto
                 {
                     Id = x.Id,
                     Date = x.Date,
@@ -129,17 +138,17 @@ namespace JustCare_MB.Services
 
         }
 
-        public async Task UpdateAppointment(int id,UpdateAppointmentDto updateAppointmentDto)
+        public async Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
         {
             if (updateAppointmentDto == null || updateAppointmentDto.Id != id)
                 throw new Exception("information is null or the id is deffrinet");
-             
+
             Appointment appointment = await _context.Appointments.FindAsync(id);
             if (appointment == null)
             {
                 throw new Exception("appointment not found");
             }
-            
+
             _mapper.Map(updateAppointmentDto, appointment);
             _context.Appointments.Update(appointment);
             await _context.SaveChangesAsync();

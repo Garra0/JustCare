@@ -14,8 +14,6 @@ namespace JustCare_MB.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Database will generate the ID
         public int Id { get; set; }
-        [StringLength(500)]
-        public string Image { get; set; }
         [StringLength(50)]
         public string EnglishName { get; set; }
         [StringLength(50)]

@@ -6,6 +6,5 @@ namespace JustCare_MB.Services.IServices
     {
         Task<IEnumerable<CategoryDto>> GetAllCategories();
         //Task<Category> getCategoryById(int id);
-
-    }
+        Task CreateCategory(CreateCategoryDto createCategoryDto);    }
 }

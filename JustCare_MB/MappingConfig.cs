@@ -24,7 +24,8 @@ namespace JustCare_MB
             CreateMap<WaitingApprovalAppointmentsBooked, AppointmentBooked>().ReverseMap();
             CreateMap<UpdateAppointmentDto, Appointment>().ReverseMap();
             CreateMap<CreateAppointmentDto, Appointment>().ReverseMap();
-            }
+            CreateMap<CreateCategoryDto, Category>().ReverseMap();
+        }
 
     }
 }

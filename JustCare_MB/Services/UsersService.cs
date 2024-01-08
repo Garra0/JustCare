@@ -6,10 +6,10 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace JustCare_MB.Services
@@ -19,6 +19,7 @@ namespace JustCare_MB.Services
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+
         public UsersService(JustCareContext context
             , IMapper mapper, IConfiguration configuration)
         {
@@ -32,9 +33,23 @@ namespace JustCare_MB.Services
         {
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
                 userLogin.Email.ToLower());
-            if (currentUser == null
-                || currentUser.Password != userLogin.Password)
+            if (currentUser == null)
                 throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
+
+            byte[] hash;
+            using (MD5 md5 = MD5.Create())
+            {
+                hash = md5.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password));
+            }
+            string hashedPassword = BitConverter.ToString(hash).Replace("-", "").ToLower();
+            if(currentUser.Password != hashedPassword)
+                throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
+
+            // var hash = HashPasword(userLogin.Password, out var salt);
+
+            //if (currentUser.Password != hash)
+            //    throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
+
 
             return currentUser;
         }
@@ -76,12 +91,12 @@ namespace JustCare_MB.Services
         }
 
         public async Task<string> Login(UserLogin userLogin)
-        {
+        { 
             var user = Authenticate(userLogin);// user exist?
             var token = await GenerateToken(user);
             return token;
         }
-
+         
         public async Task Register(UserRegisterDto userRegisterDto)
         {
             //if (userRegisterDto == null)
@@ -100,6 +115,14 @@ namespace JustCare_MB.Services
             // remove the spaces before and after the string:
             // "  hello word  ".Trim() will be => "hello word"
             //user.Email = user.Email.Trim(); but i have RegularExpression
+
+            byte[] hash;
+            using (MD5 md5 = MD5.Create())
+            {
+                hash = md5.ComputeHash(Encoding.UTF8.GetBytes(userRegisterDto.Password));
+            }
+            string hashedPassword = BitConverter.ToString(hash).Replace("-", "").ToLower();
+            user.Password = hashedPassword;
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -149,7 +172,7 @@ namespace JustCare_MB.Services
                     || s.Email.ToLower().
                     Contains(usersIndexDto.SearchTerm.ToLower()));
                 }
-                
+
                 if (!await users.AnyAsync())
                     throw new NotFoundException("Users have not this key");
                 usersIndexDto.Users = _mapper.Map<List<UserDto>>(users);
@@ -174,7 +197,7 @@ namespace JustCare_MB.Services
             if (jsonToken != null)
             {
                 // Retrieve user ID from the "sub" claim
-                int userId =int.Parse(jsonToken
+                int userId = int.Parse(jsonToken
                     .Claims.First(claim => claim.Type == "Id").Value);
 
                 return userId;
@@ -187,7 +210,7 @@ namespace JustCare_MB.Services
 
         public async Task<User> GetUserById(int id)
         {
-            if (!await _context.Users.AnyAsync(x=>x.Id==id))
+            if (!await _context.Users.AnyAsync(x => x.Id == id))
                 throw new InvalidIdException("id is not exist");
 
             User? user = await _context.Users.FindAsync(id);
@@ -197,7 +220,7 @@ namespace JustCare_MB.Services
         }
 
         public async Task DeleteUser(int id)
-        {   
+        {
             if (!await _context.Users.AnyAsync(x => x.Id == id))
                 throw new InvalidIdException("id is not exist");
 

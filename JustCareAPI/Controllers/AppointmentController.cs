@@ -23,7 +23,7 @@ namespace JustCareAPI.Controllers
         }
 
         //2-
-        [HttpPost("Create appointment")]
+        [HttpPost("Create appointment"), Authorize(Roles = "Dentist")]
         public async Task<ActionResult> CreateAppointment(CreateAppointmentDto appointmentDto)
         {
             await _appointmentService.CreateAppointment(appointmentDto);

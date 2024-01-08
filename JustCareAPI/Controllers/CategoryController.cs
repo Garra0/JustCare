@@ -16,6 +16,16 @@ namespace JustCareAPI.Controllers
             _CategoryService = categoryService;
         }
 
+        [AllowAnonymous]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpPost("CreateCategory")]
+        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryDto createCategoryDto)
+        {
+            await _CategoryService.CreateCategory(createCategoryDto);
+            return Ok();
+        }
+
         [HttpGet("GetAllCategorys")]
         public async Task<IActionResult> GetAllCategorys()
         {
