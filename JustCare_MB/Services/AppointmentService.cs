@@ -28,24 +28,26 @@ namespace JustCare_MB.Services
         public async Task CreateAppointment(CreateAppointmentDto appointmentDto)
         {
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
-            if (userIdClaim != null
-                && int.TryParse(userIdClaim.Value, out int userId))
-                appointmentDto.DentistUserId = userId;
-            else
+            if (userIdClaim == null
+                || !int.TryParse(userIdClaim.Value, out int dentistUserId))
                 throw new NotFoundException("The token invalid");
+            //appointmentDto.DentistUserId = userId;
+
+
 
             // appointment not Exists?
             if (await _context.Appointments.AnyAsync(u => u.Date == appointmentDto.Date)
-                && await _context.Appointments.AnyAsync(u => u.DentistUserId == appointmentDto.DentistUserId))
+                && await _context.Appointments.AnyAsync(u => u.DentistUserId == dentistUserId))
                 throw new ExistsException("Appointment Exists");
 
             // the appointment should be after 12h at least
             if (appointmentDto.Date < DateTime.Now.AddHours(12))
                 throw new TimeNotValid("The appointment must be at least 12 hours away");
 
-            
+
 
             Appointment appointment = _mapper.Map<Appointment>(appointmentDto);
+            appointment.DentistUserId = dentistUserId;
             await _context.Appointments.AddAsync(appointment);
             _context.SaveChanges();
         }

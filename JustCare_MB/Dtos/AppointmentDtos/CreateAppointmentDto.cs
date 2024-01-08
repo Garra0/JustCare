@@ -9,8 +9,6 @@ namespace JustCare_MB.Dtos.AppointmentDtos
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         [Required]
-        public int? DentistUserId { get; set; }
-        [Required]
         public int CategoryId { get; set; }
         public string CategoryName { get; set; }
 
