@@ -19,7 +19,9 @@ namespace JustCare_MB.Dtos
         public string PhoneNumber { get; set; }
         [Required]
         [Range(3, 120)]
-        public int Age { get; set; } //
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? Age { get; set; }
         public int? NationalId { get; set; } // 30818134
          
          

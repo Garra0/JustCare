@@ -113,17 +113,15 @@ namespace JustCare_MB.Middlewares
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                //context.Response.StatusCode
-                //    = (int)HttpStatusCode.InternalServerError;
-
-                //ProblemDetails problem = new()
-                //{
-                //    Status = (int)HttpStatusCode.InternalServerError,
-                //    Type = "Server error",
-                //    Title = "Server Error",
-                //    Detail = "an Internal Server Error has occurred"
-
-                //};
+                context.Response.StatusCode
+                    = (int)HttpStatusCode.BadRequest;
+                problem = new()
+                {
+                    Status = (int)HttpStatusCode.BadRequest,
+                    Type = ex.Message,
+                    Title = ex.Message,
+                    Detail = string.Format("a {0} Error", ex.Message)
+                };
             }
             finally
             {

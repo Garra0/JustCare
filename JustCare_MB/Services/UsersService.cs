@@ -6,7 +6,9 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -19,7 +21,6 @@ namespace JustCare_MB.Services
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
-
         public UsersService(JustCareContext context
             , IMapper mapper, IConfiguration configuration)
         {
@@ -45,12 +46,6 @@ namespace JustCare_MB.Services
             if(currentUser.Password != hashedPassword)
                 throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
 
-            // var hash = HashPasword(userLogin.Password, out var salt);
-
-            //if (currentUser.Password != hash)
-            //    throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
-
-
             return currentUser;
         }
 
@@ -62,14 +57,16 @@ namespace JustCare_MB.Services
             var credentials = new SigningCredentials
                 (securityKey, SecurityAlgorithms.HmacSha256);
 
-            int userTypeId = await _context.Users
-                .Where(x => x.Email == user.Email).Select(x => x.UserTypeId)
-                .FirstOrDefaultAsync();
+            int userTypeId = 
+            await _context.Users
+            .Where(x => x.Email == user.Email).Select(x => x.UserTypeId)
+            .FirstOrDefaultAsync();
 
 
             string UserRole = await _context.UserTypes
-                .Where(x => x.Id == userTypeId).Select(x => x.EnglishType)
-                .FirstAsync();
+                .Where(x => x.Id == userTypeId)
+                .Select(x => x.EnglishType)
+                .FirstOrDefaultAsync();
 
             Claim[] claims = new[]
             {
@@ -85,9 +82,7 @@ namespace JustCare_MB.Services
                 expires: DateTime.Now.AddDays(7),
                 signingCredentials: credentials);
 
-
             return new JwtSecurityTokenHandler().WriteToken(token);
-
         }
 
         public async Task<string> Login(UserLogin userLogin)
@@ -99,9 +94,6 @@ namespace JustCare_MB.Services
          
         public async Task Register(UserRegisterDto userRegisterDto)
         {
-            //if (userRegisterDto == null)
-            //    throw new EmptyFieldException("Empty field");
-
             if (await _context.Users.AnyAsync(u => u.Email.ToLower()
             == userRegisterDto.Email.ToLower()))
                 throw new ExistsException("Email is exists");

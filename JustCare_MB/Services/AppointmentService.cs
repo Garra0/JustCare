@@ -2,11 +2,14 @@
 using JustCare_MB.Data;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
+using JustCare_MB.Dtos.Category;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System.Security.Claims;
 
 namespace JustCare_MB.Services
@@ -16,24 +19,28 @@ namespace JustCare_MB.Services
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger<AppointmentService> _logger;
+
         public AppointmentService(JustCareContext context
-            , IMapper mapper, IHttpContextAccessor httpContextAccessor)
+            , IMapper mapper, IHttpContextAccessor httpContextAccessor
+            , ILogger<AppointmentService> logger)
         {
             _context = context;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
 
         //2-
         public async Task CreateAppointment(CreateAppointmentDto appointmentDto)
         {
+            _logger.LogInformation(
+                 $"Create Appointment: {JsonConvert.SerializeObject(appointmentDto)}");
+            
             var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
             if (userIdClaim == null
                 || !int.TryParse(userIdClaim.Value, out int dentistUserId))
                 throw new NotFoundException("The token invalid");
-            //appointmentDto.DentistUserId = userId;
-
-
 
             // appointment not Exists?
             if (await _context.Appointments.AnyAsync(u => u.Date == appointmentDto.Date)
@@ -55,6 +62,9 @@ namespace JustCare_MB.Services
         //4.1-
         public async Task<DatesDto> GetAllAppoitnmentDatesDtoByCategoryId(int Categoryid)
         {
+            _logger.LogInformation(
+                $"Get All Appoitnment Dates By Category Id: {JsonConvert.SerializeObject(Categoryid)}");
+
             if (!await _context.Categories.AnyAsync(x => x.Id == Categoryid))
                 throw new InvalidIdException("id is not exist");
 

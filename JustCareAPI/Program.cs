@@ -7,9 +7,24 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//logger
+
+//builder.Host.UseSerilog((context, Configuration) =>
+//Configuration
+//.WriteTo.Console()
+//.MinimumLevel.Information()
+//);
+
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
+// end logger
+
 
 // Add services to the container.
 
@@ -97,7 +112,11 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
 
 
+
+
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,48 +1,52 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
-using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.Category;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace JustCare_MB.Services
 {
     public class CategoryService : ICategoryService
     {
+        //for the images (to get the path)
         private readonly IHostEnvironment _hostEnvironment;
-
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
+        private readonly ILogger<CategoryService> _logger;
         public CategoryService(JustCareContext context
-            , IMapper mapper, IHostEnvironment hostEnvironment)
+            , IMapper mapper, IHostEnvironment hostEnvironment
+            , ILogger<CategoryService> logger)
         {
             _context = context;
             _mapper = mapper;
             _hostEnvironment = hostEnvironment;
+            _logger = logger;
         }
 
         public async Task CreateCategory(CreateCategoryDto createCategoryDto)
         {
+            _logger.LogInformation(
+              $"Create new Category {JsonConvert.SerializeObject(createCategoryDto)}"
+              );
+
             if (await _context.Categories.AnyAsync(x => x.EnglishName.ToLower()
             == createCategoryDto.EnglishName.ToLower()))
                 throw new ExistsException("Category is exists");
 
-            
+
 
             string imageName = createCategoryDto.EnglishName + ".jpg";
-            string imagePath = _hostEnvironment.ContentRootPath + "\\Images\\Categories\\" + imageName;
+            string imagePath = _hostEnvironment.ContentRootPath
+                + "\\Images\\Categories\\" + imageName;
+            // the next 2 lines eqaule to the above
+            //string im = Path.Combine(_hostEnvironment.ContentRootPath
+            //    + "Images" + "Categories" + imageName);
             imagePath = imagePath.Replace("JustCareAPI", "JustCare_MB"); // Replace from "JustCareAPI" to "JustCare_MB"  
-            //category.Image = await File.ReadAllBytesAsync(imagePath);
-            //var imagePath = Path.Combine("Images", "Categories", imageName);
 
             using (var stream = new FileStream(imagePath, FileMode.Create))
             {
@@ -60,6 +64,10 @@ namespace JustCare_MB.Services
 
         public async Task<IEnumerable<CategoryDto>> GetAllCategories()
         {
+            _logger.LogInformation(
+              $"Get all Categories"
+              );
+
             IEnumerable<Category> categories = await _context.Categories.ToListAsync();
             IEnumerable<CategoryDto> categoryDtos = _mapper.Map<IEnumerable<CategoryDto>>(categories);
 
@@ -67,7 +75,7 @@ namespace JustCare_MB.Services
             {
                 string imageName = category.EnglishName;
                 //var imagePath = Path.Combine("Images", "Categories", $"{imageName}.jpg");
-                string imagePath = _hostEnvironment.ContentRootPath+ "\\Images\\Categories\\" + imageName+".jpg";
+                string imagePath = _hostEnvironment.ContentRootPath + "\\Images\\Categories\\" + imageName + ".jpg";
                 imagePath = imagePath.Replace("JustCareAPI", "JustCare_MB"); // Replace from "JustCareAPI" to "JustCare_MB"  
                 category.Image = await File.ReadAllBytesAsync(imagePath);
             }
@@ -81,38 +89,7 @@ namespace JustCare_MB.Services
         //    Category category = await _context.Categories.
         //        FirstAsync(c => c.Id == id);
         //    return category;
-        //}
-
-        //public async Task UploadCategoryImage(byte[] imageData, string imageName)
-        //{
-        //    imageName = imageName + ".jpg";
-        //    var imagePath = Path.Combine("Images", "Categories", imageName);
-
-        //    using (var stream = new FileStream(imagePath, FileMode.Create))
-        //    {
-        //        await stream.WriteAsync(imageData);
-        //    }
-
-
-        //}
-
-        //public async Task<byte[]> GetImageAsync(string imageName)
-        //{
-        //    var imagePath = Path.Combine("wwwroot", "Images", imageName);
-        //    return await File.ReadAllBytesAsync(imagePath);
-        //    //catch (FileNotFoundException)
-        //    //{
-        //    //    // Handle the exception as needed (e.g., log, return a default image, etc.)
-        //    //    throw;
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    // Handle the exception as needed
-        //    //    throw;
-        //    //}
-        //}
-
-
+        //} 
     }
 
 }
