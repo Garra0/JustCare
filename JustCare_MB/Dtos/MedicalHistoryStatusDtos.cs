@@ -1,4 +1,5 @@
-﻿using JustCare_MB.Models;
+﻿using JustCare_MB.Dtos.User;
+using JustCare_MB.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace JustCare_MB.Dtos
@@ -13,7 +14,7 @@ namespace JustCare_MB.Dtos
         // Relations:
         // User
         public int UserId { get; set; }
-        public UserLoginDto User { get; set; }
+        public User.UserLoginRequestDto User { get; set; }
         // MedicalHistory
         public int MedicalHistoryId { get; set; }
         public MedicalHistory MedicalHistory { get; set; }

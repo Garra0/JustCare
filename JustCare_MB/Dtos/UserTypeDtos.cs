@@ -1,4 +1,5 @@
-﻿using JustCare_MB.Models;
+﻿using JustCare_MB.Dtos.User;
+using JustCare_MB.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace JustCare_MB.Dtos
@@ -15,7 +16,7 @@ namespace JustCare_MB.Dtos
 
 
         // Relations
-        public ICollection<UserLoginDto> Users { get; set; }
+        public ICollection<User.UserLoginRequestDto> Users { get; set; }
 
     }
 }

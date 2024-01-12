@@ -95,13 +95,14 @@ namespace JustCare_MB.Services
 
             IEnumerable<WaitingApprovalAppointmentsBooked> waitingApprovalAppointmentsBooked =
                 await _context.AppointmentBookeds
-                .Where(x => x.Status != "Accepted")
+                .Where(x => x.Status == "Appointment booked")
                 // برجع المواعيد التابعة للدكتور مو مواعيد كل الدكاترة..
                 .Where(x => x.Appointment.DentistUserId == DentistId
                 && x.Appointment.Id == x.Appointment.AppointmentBooked.AppointmentId)
                 //.Where(x=> appointmentIdsByDentistUserId.Contains(x.AppointmentId))
                 .Select(x => new WaitingApprovalAppointmentsBooked
                 {
+                    AppointmentBookedId=x.Id,
                     Image = x.Image,
                     Note = x.Note,
                     Status = x.Status,
@@ -121,6 +122,10 @@ namespace JustCare_MB.Services
                     }
                 }).OrderBy(e => e.Date).ToListAsync();
 
+            if (waitingApprovalAppointmentsBooked == null)
+                throw new NotFoundException
+                    ("there are no Approval AppointmentsBooked on waiting");
+
             return waitingApprovalAppointmentsBooked;
         }
 
@@ -135,6 +140,9 @@ namespace JustCare_MB.Services
 
             AppointmentBooked appointmentBooked = await _context
                 .AppointmentBookeds.FirstAsync(x => x.Id == appointmentBookedId);
+            if (appointmentBooked == null)
+                throw new InvalidIdException("the appointmentId is wrong");
+
             if (appointmentBooked.Status == "Accepted")
                 throw new ExistsException("This appoitnmentBooked have been accepted");
 

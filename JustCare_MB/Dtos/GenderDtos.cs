@@ -1,4 +1,5 @@
-﻿using JustCare_MB.Models;
+﻿using JustCare_MB.Dtos.User;
+using JustCare_MB.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -19,7 +20,7 @@ namespace JustCare_MB.Dtos
         public string ArabicType { get; set; }
 
         // Relations
-        public ICollection<UserLoginDto> Users { get; set; } //= new List<User>();
+        public ICollection<User.UserLoginRequestDto> Users { get; set; } //= new List<User>();
 
 
     }

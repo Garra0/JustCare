@@ -10,6 +10,7 @@ namespace JustCare_MB.Dtos.AppointmentDtos
 {
     public class WaitingApprovalAppointmentsBooked
     {
+        public int AppointmentBookedId { get; set; }
         public string Image { get; set; }
         public string Note { get; set; }
         public string Status { get; set; }

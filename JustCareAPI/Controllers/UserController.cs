@@ -1,10 +1,9 @@
 ﻿using JustCare_MB.Dtos;
+using JustCare_MB.Dtos.User;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace JustCareAPI.Controllers
 {
@@ -32,10 +31,10 @@ namespace JustCareAPI.Controllers
         [HttpPost("Login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> Login([FromBody] UserLogin userLogin)
+        public async Task<ActionResult> Login([FromBody] UserLoginRequestDto userLogin)
         {
-            string token = await _userService.Login(userLogin);
-            return Ok(token);
+            UserLoginResponseDto userLoginResponseDto = await _userService.Login(userLogin);
+            return Ok(userLoginResponseDto);
         }
 
 

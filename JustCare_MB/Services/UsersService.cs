@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
 using JustCare_MB.Dtos;
+using JustCare_MB.Dtos.User;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -30,7 +32,7 @@ namespace JustCare_MB.Services
         }
 
         //To authenticate user
-        private User Authenticate(UserLogin userLogin)
+        private User Authenticate(UserLoginRequestDto userLogin)
         {
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
                 userLogin.Email.ToLower());
@@ -50,7 +52,8 @@ namespace JustCare_MB.Services
         }
 
         // To generate token
-        private async Task<string> GenerateToken(User user)
+        private async Task<string> GenerateToken(User user
+            , UserLoginResponseDto userLoginResponseDto)
         {
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey
                 (Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
@@ -62,11 +65,13 @@ namespace JustCare_MB.Services
             .Where(x => x.Email == user.Email).Select(x => x.UserTypeId)
             .FirstOrDefaultAsync();
 
-
+            
             string UserRole = await _context.UserTypes
                 .Where(x => x.Id == userTypeId)
                 .Select(x => x.EnglishType)
                 .FirstOrDefaultAsync();
+            
+            userLoginResponseDto.UserRole = UserRole;
 
             Claim[] claims = new[]
             {
@@ -85,11 +90,17 @@ namespace JustCare_MB.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public async Task<string> Login(UserLogin userLogin)
+        public async Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin)
         { 
+            UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto();
+
             var user = Authenticate(userLogin);// user exist?
-            var token = await GenerateToken(user);
-            return token;
+            var token = await GenerateToken(user, userLoginResponseDto);
+
+            userLoginResponseDto.Token = token;
+            userLoginResponseDto.UserName = user.FullName;
+
+            return userLoginResponseDto;
         }
          
         public async Task Register(UserRegisterDto userRegisterDto)
