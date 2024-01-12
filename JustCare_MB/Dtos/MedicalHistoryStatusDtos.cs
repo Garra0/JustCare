@@ -14,7 +14,7 @@ namespace JustCare_MB.Dtos
         // Relations:
         // User
         public int UserId { get; set; }
-        public User.UserLoginRequestDto User { get; set; }
+        public UserLoginRequestDto User { get; set; }
         // MedicalHistory
         public int MedicalHistoryId { get; set; }
         public MedicalHistory MedicalHistory { get; set; }
