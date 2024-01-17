@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using JustCare_MB.Models;
+﻿using JustCare_MB.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace JustCare_MB.Data
 {
@@ -23,10 +23,10 @@ namespace JustCare_MB.Data
 
         public DbSet<MedicalHistory> MedicalHistories { get; set; }
 
+        public DbSet<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+       => optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare;Trusted_Connection=True;");
 
-       // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-       //=> optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare3;Trusted_Connection=True;");
-       
 
 
 
@@ -69,12 +69,23 @@ namespace JustCare_MB.Data
             {
                 entity.HasKey(u => u.Id);
                 entity.ToTable("UserType");
+
+                entity.HasData(
+                    new UserType { Id = 1, EnglishType = "Dentist", ArabicType = "دكتور اسنان" },
+                    new UserType { Id = 2, EnglishType = "Patient", ArabicType = "مريض" },
+                    new UserType { Id = 3, EnglishType = "Admin", ArabicType = "آدمن" }
+                    );
             });
-            
+
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasKey(u => u.Id);
                 entity.ToTable("Category");
+
+                entity.HasData(
+                    new Category { Id = 1, EnglishName = "Withdrawal of nerve", ArabicName = "سحب عصب" },
+                    new Category { Id = 2, EnglishName = "Tooth removal", ArabicName = "خلع اسنان" }
+                    );
             });
 
             modelBuilder.Entity<Appointment>(entity =>
@@ -103,6 +114,15 @@ namespace JustCare_MB.Data
             {
                 entity.HasKey(u => u.Id);
                 entity.ToTable("Gender");
+
+                entity.HasData(
+                    new Gender {Id = 1, EnglishType = "Male", ArabicType = "ذكر" },
+                    new Gender {Id = 2, EnglishType = "Fmale", ArabicType = "انثى" }
+                    );
+                //entity.HasMany(u => u.Users)
+                //.WithOne(u => u.Gender)
+                //.HasForeignKey(u => u.GenderId)
+                //.OnDelete(DeleteBehavior.ClientSetNull);
             });
 
             modelBuilder.Entity<MedicalHistoryStatus>(entity =>
@@ -115,7 +135,17 @@ namespace JustCare_MB.Data
                .HasForeignKey(u => u.MedicalHistoryId)
                .OnDelete(DeleteBehavior.ClientSetNull);
             });
-               
+
+            modelBuilder.Entity<DentistAppointmentImage>(entity =>
+            {
+                entity.HasKey(u => u.Id);
+                entity.ToTable("DentistAppointmentImage");
+
+                entity.HasOne(u => u.Appointment)
+                .WithMany(u => u.DentistAppointmentImages)
+                .HasForeignKey(u => u.AppointmentId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            });
 
             //modelBuilder.Entity<AppointmentBooked>()
             //   .HasOne(u => u.Appointment)
@@ -164,5 +194,5 @@ namespace JustCare_MB.Data
         //partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 
 
-    } 
+    }
 }

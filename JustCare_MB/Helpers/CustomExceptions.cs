@@ -51,3 +51,10 @@ public class TimeNotValid : Exception
         : base(String.Format(timeNotValid)) { }
 }
 
+public class ImagesBadRequest : Exception
+{
+    public ImagesBadRequest() { }
+    public ImagesBadRequest(string imagesBadRequest)
+        : base(String.Format(imagesBadRequest)) { }
+}
+

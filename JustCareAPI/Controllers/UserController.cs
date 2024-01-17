@@ -71,7 +71,7 @@ namespace JustCareAPI.Controllers
         }
 
 
-        [HttpDelete("{id:int}")]
+        [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -81,10 +81,10 @@ namespace JustCareAPI.Controllers
             return Ok();
         }
 
-        [HttpPut("{id:int}", Name = "UpdateVilla")]
-        public async Task<ActionResult> UpdateUser(int id, UserDto userEdited)
+        [HttpPut]
+        public async Task<ActionResult> UpdateUser(UserDto userEdited)
         {
-                await _userService.UpdateUser(id, userEdited);
+                await _userService.UpdateUser(userEdited);
                 return Ok();
         }
 

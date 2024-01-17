@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
 using JustCare_MB.Dtos;
+using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.User;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -20,15 +22,20 @@ namespace JustCare_MB.Services
 {
     public class UsersService : IUsersService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JustCareContext _context;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<User> _logger;
         public UsersService(JustCareContext context
-            , IMapper mapper, IConfiguration configuration)
+            , IMapper mapper, IConfiguration configuration, ILogger<User> logger
+            , IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         //To authenticate user
@@ -45,14 +52,14 @@ namespace JustCare_MB.Services
                 hash = md5.ComputeHash(Encoding.UTF8.GetBytes(userLogin.Password));
             }
             string hashedPassword = BitConverter.ToString(hash).Replace("-", "").ToLower();
-            if(currentUser.Password != hashedPassword)
+            if (currentUser.Password != hashedPassword)
                 throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
 
             return currentUser;
         }
 
         // To generate token
-        private async Task<string> GenerateToken(User user
+        private async Task GenerateTokenAndCreateUserLoginDto(User user
             , UserLoginResponseDto userLoginResponseDto)
         {
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey
@@ -60,18 +67,34 @@ namespace JustCare_MB.Services
             var credentials = new SigningCredentials
                 (securityKey, SecurityAlgorithms.HmacSha256);
 
-            int userTypeId = 
-            await _context.Users
-            .Where(x => x.Email == user.Email).Select(x => x.UserTypeId)
-            .FirstOrDefaultAsync();
+            //string UserRole =
+            //    await _context.Users.Include(x=>x.UserType)
+            //    .Where(x=>x.Email==user.Email)
+            //    .Select(x => x.UserType.EnglishType)
+            //    .FirstOrDefaultAsync();
 
-            
-            string UserRole = await _context.UserTypes
-                .Where(x => x.Id == userTypeId)
-                .Select(x => x.EnglishType)
+            // equal to the above...
+            string UserRole =
+                await _context.Users
+                .Where(x => x.Email == user.Email)
+                .Select(x => x.UserType.EnglishType)
                 .FirstOrDefaultAsync();
-            
-            userLoginResponseDto.UserRole = UserRole;
+
+            // equal to the above...
+            //string UserRole =
+            //    (await _context.Users
+            //    .FirstOrDefaultAsync(x => x.Email == user.Email)).UserType.EnglishType;
+
+            //int userTypeId = 
+            //await _context.Users
+            //.Where(x => x.Email == user.Email).Select(x => x.UserTypeId)
+            //.FirstOrDefaultAsync();
+
+
+            //string UserRole = await _context.UserTypes
+            //    .Where(x => x.Id == userTypeId)
+            //    .Select(x => x.EnglishType)
+            //    .FirstOrDefaultAsync();
 
             Claim[] claims = new[]
             {
@@ -87,22 +110,22 @@ namespace JustCare_MB.Services
                 expires: DateTime.Now.AddDays(7),
                 signingCredentials: credentials);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var StringToken = new JwtSecurityTokenHandler().WriteToken(token);
+            userLoginResponseDto.UserRole = UserRole;
+            userLoginResponseDto.Token = StringToken; // token saved here
+            userLoginResponseDto.UserName = user.FullName;
         }
 
         public async Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin)
-        { 
+        {
             UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto();
 
             var user = Authenticate(userLogin);// user exist?
-            var token = await GenerateToken(user, userLoginResponseDto);
-
-            userLoginResponseDto.Token = token;
-            userLoginResponseDto.UserName = user.FullName;
+            await GenerateTokenAndCreateUserLoginDto(user, userLoginResponseDto);
 
             return userLoginResponseDto;
         }
-         
+
         public async Task Register(UserRegisterDto userRegisterDto)
         {
             if (await _context.Users.AnyAsync(u => u.Email.ToLower()
@@ -131,28 +154,54 @@ namespace JustCare_MB.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateUser(int id, UserDto userEdited)
+        public async Task DeleteUser(int id)
         {
-            //if (userEdited == null)
-            //    throw new EmptyFieldException("Empty Field");
-            if (userEdited.Id != id)
-                throw new InvalidIdException("Id is null or the Ids are diffrenete");
-            if (!await _context.Users.AnyAsync(x => x.Id == id))
-                throw new InvalidIdException("id is not exist");
-            //var user2 = await _context.Users.FirstOrDefaultAsync(e => e.Id == id);
-            //if (user2 == null)
-            //    throw new Exception("User not found");
+            _logger.LogInformation(
+      $"Delete user: {JsonConvert.SerializeObject(id)}");
 
-            User? user = await _context.Users.FindAsync(id);
+            if (!await _context.Users.AnyAsync(x => x.Id == id))
+                throw new InvalidIdException("Id is not found on user DB");
+
+            User user = await _context
+              .Users.FirstAsync(x => x.Id == id);
+            if (user == null)
+                throw new NotFoundException("User is not exist on DB");
+
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateUser(UserDto userEdited)
+        {
+            _logger.LogInformation(
+      $"Delete user: {JsonConvert.SerializeObject(userEdited)}");
+
+            var idClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (idClaim == null
+                || !int.TryParse(idClaim.Value, out int id))
+                throw new NotFoundException("User token invalid");
+
+            if (!await _context.Users.AnyAsync(x => x.Id == id))
+                throw new InvalidIdException("Id is not found on user DB");
+
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
                 throw new NotFoundException("User not found");
-
+             
 
             // update need a special map, copy the userEdited to user and save the other attribuits on user
             _mapper.Map(userEdited, user);
             _context.Users.Update(user);
             await _context.SaveChangesAsync();
         }
+
+
+
+
+
+
+
+
 
         public async Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null)
         {
@@ -220,19 +269,6 @@ namespace JustCare_MB.Services
             if (user == null)
                 throw new NotFoundException("User is null");
             return user;
-        }
-
-        public async Task DeleteUser(int id)
-        {
-            if (!await _context.Users.AnyAsync(x => x.Id == id))
-                throw new InvalidIdException("id is not exist");
-
-            User? user = await _context.Users.FindAsync(id);
-            if (user == null)
-                throw new NotFoundException("User is null");
-
-            _context.Users.Remove(user);
-            _context.SaveChanges();
         }
     }
 }

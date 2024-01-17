@@ -45,18 +45,19 @@ namespace JustCareAPI.Controllers
             return appointmentDtos;
         }
 
-        
-
-        [HttpDelete("{id:int}")]
-        public async Task<ActionResult> DeleteAppointment(int id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAppointment(int appointmentId)
         {
-            bool isSuccess = await _appointmentService.DeleteAppointment(id);
-            if (isSuccess)
-            {
-                return Ok(id);
-            }
-            return BadRequest(id);
+            await _appointmentService.DeleteAppointment(appointmentId);
+            return Ok();
+
         }
+
+
+
+
+
+
 
         [HttpPut("{id:int}", Name = "UpdateAppointment")]
         public async Task<IActionResult> UpdateAppointment(int id, UpdateAppointmentDto appointmentDto)

@@ -88,6 +88,19 @@ namespace JustCare_MB.Middlewares
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.StatusCode
+                    = (int)HttpStatusCode.NotFound;
+                problem = new()
+                {
+                    Status = (int)HttpStatusCode.NotFound,
+                    Type = ex.Message,
+                    Title = ex.Message,
+                    Detail = string.Format("a {0} Error", ex.Message)
+                };
+            }
+            catch (TimeNotValid ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                context.Response.StatusCode
                     = (int)HttpStatusCode.BadRequest;
                 problem = new()
                 {
@@ -97,7 +110,7 @@ namespace JustCare_MB.Middlewares
                     Detail = string.Format("a {0} Error", ex.Message)
                 };
             }
-            catch (TimeNotValid ex)
+            catch (ImagesBadRequest ex)
             {
                 _logger.LogError(ex, ex.Message);
                 context.Response.StatusCode

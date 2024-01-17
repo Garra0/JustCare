@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JustCare_MB.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,9 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
     {
         public int AppointmentId { get; set; }
         public DateTime Date { get; set; }
+        public List<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        public string DentistDescription { get; set; }
+        public IList<byte[]> images { get; set; }
     }
+    
 }

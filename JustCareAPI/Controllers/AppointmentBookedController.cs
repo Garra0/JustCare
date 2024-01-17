@@ -58,16 +58,14 @@ namespace JustCareAPI.Controllers
             return Ok();
         }
 
-        //[HttpDelete("{id:int}")]
-        //public Task<IActionResult> DeleteAppointmentBooked(int appointmentBookedDtoId)
-        //{
-        //bool isSuccess = await _appointmentService.DeleteAppointment(id);
-        //    if (isSuccess)
-        //    {
-        //        return Ok(id);
-        //    }
-        //    return BadRequest(id);
-        //}
+        [HttpDelete]
+        public async Task<IActionResult> Deleteappointmentbooked(int appointmentBookedId)
+        {
+            await _appointmentBookedService.DeleteAppointmentBooked(appointmentBookedId);
+            return Ok();
+
+        }
+
         //[HttpPut("{id:int}", Name = "UpdateAppointment")]
         //public Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto)
         //{

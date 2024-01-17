@@ -3,6 +3,7 @@ using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Dtos.Category;
+using JustCare_MB.Dtos.User;
 using JustCare_MB.Models;
 using System;
 using System.Collections.Generic;

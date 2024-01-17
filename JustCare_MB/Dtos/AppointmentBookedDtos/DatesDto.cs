@@ -11,6 +11,6 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
         public int CategoryId { get; set; }
         public IEnumerable<AppointmentDates> appointmentDates { get; set; }
         public string CategoryName { get; set; }
-
+        
     }
 }

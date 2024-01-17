@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace JustCare_MB.Services
 {
@@ -88,7 +89,7 @@ namespace JustCare_MB.Services
      $"Get All Waiting Approval Appointments (appointmentbookeds)");
 
             // token
-            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role);
             if (DentistIdClaim == null
                 || !int.TryParse(DentistIdClaim.Value, out int DentistId))
                 throw new NotFoundException("Dentist token invalid");
@@ -111,7 +112,7 @@ namespace JustCare_MB.Services
                     {
                         Id = x.PatientUser.Id,
                         PhoneNumber = x.PatientUser.PhoneNumber,
-                        Age = x.PatientUser.Age,
+                        BirthDay = x.PatientUser.BirthDay,
                         NationalId = x.PatientUser.NationalId,
                         UserType = x.PatientUser.UserType.ArabicType,
                         Gender = x.PatientUser.Gender.ArabicType,
@@ -155,7 +156,7 @@ namespace JustCare_MB.Services
         public async Task AppointmentBookedRejected(int appointmentBookedId)
         {
             _logger.LogInformation(
-      $"AppointmentBooked Accepted: {JsonConvert.SerializeObject(appointmentBookedId)}");
+      $"AppointmentBooked Rejected: {JsonConvert.SerializeObject(appointmentBookedId)}");
 
             if (!await _context.AppointmentBookeds.AnyAsync(x => x.Id == appointmentBookedId))
                 throw new InvalidIdException("Id is not exist");
@@ -165,6 +166,38 @@ namespace JustCare_MB.Services
             _context.AppointmentBookeds.Remove(appointmentBooked);
             await _context.SaveChangesAsync();
         }
+         
+        public async Task DeleteAppointmentBooked(int appointmentBookedId)
+        {
+            _logger.LogInformation(
+      $"Delete AppointmentBooked: {JsonConvert.SerializeObject(appointmentBookedId)}");
+
+            if (!await _context.AppointmentBookeds.AnyAsync(x => x.Id == appointmentBookedId))
+                throw new InvalidIdException("Id is not exist on AppointmentBooked");
+
+            AppointmentBooked appointmentBooked = await _context
+              .AppointmentBookeds.FirstAsync(x => x.Id == appointmentBookedId);
+            _context.AppointmentBookeds.Remove(appointmentBooked);
+            await _context.SaveChangesAsync();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // to show the use page..
         public async Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int AppointmentId)
@@ -196,10 +229,7 @@ namespace JustCare_MB.Services
 
 
 
-        public Task<bool> DeleteAppointmentBooked(int appointmentBookedDtoId)
-        {
-            throw new NotImplementedException();
-        }
+       
 
         public Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto)
         {

@@ -22,7 +22,7 @@ namespace JustCare_MB.Dtos.AppointmentDtos
     {
         public int Id { get; set; }
         public string PhoneNumber { get; set; }
-        public DateTime? Age { get; set; } //
+        public DateTime BirthDay { get; set; } //
         public int? NationalId { get; set; } // 30818134
         public string UserType { get; set; }
         public string Gender { get; set; }

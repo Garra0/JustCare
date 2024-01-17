@@ -109,3 +109,7 @@ C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Serilog.Sinks.Deb
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Text.Encodings.Web.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.Text.Json.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\runtimes\browser\lib\net7.0\System.Text.Encodings.Web.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Humanizer.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Microsoft.EntityFrameworkCore.Design.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\Mono.TextTemplating.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCareAPI\bin\Debug\net7.0\System.CodeDom.dll

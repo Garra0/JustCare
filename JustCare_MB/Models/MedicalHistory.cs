@@ -9,8 +9,10 @@ namespace JustCare_MB.Models
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Database will generate the ID
         public int Id { get; set; }
+        [Required]
         [StringLength(150)]
         public string EnglishDisease { get; set; }
+        [Required]
         [StringLength(150)]
         public string ArabicDisease { get; set; }
 

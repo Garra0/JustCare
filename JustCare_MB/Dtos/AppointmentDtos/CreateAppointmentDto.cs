@@ -10,7 +10,12 @@ namespace JustCare_MB.Dtos.AppointmentDtos
         public DateTime Date { get; set; }
         [Required]
         public int CategoryId { get; set; }
-        public string CategoryName { get; set; }
+        [Required]
+        public string DentistDescription { get; set; }
+        //public string CategoryName { get; set; }
+        [MaxLength(5, ErrorMessage = "You can upload a maximum of 5 images.")]
+        public ICollection<byte[]> Images { get; set; }
+
 
     }
 }

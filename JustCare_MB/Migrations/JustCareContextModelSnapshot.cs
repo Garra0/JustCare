@@ -36,6 +36,10 @@ namespace JustCare_MB.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DentistDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("DentistUserId")
                         .HasColumnType("int");
 
@@ -48,7 +52,7 @@ namespace JustCare_MB.Migrations
                     b.ToTable("Appointment", (string)null);
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.AppointmentInfo.AppointmentBooked", b =>
+            modelBuilder.Entity("JustCare_MB.Models.AppointmentBooked", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -105,17 +109,108 @@ namespace JustCare_MB.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Category", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ArabicName = "سحب عصب",
+                            EnglishName = "Withdrawal of nerve"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ArabicName = "خلع اسنان",
+                            EnglishName = "Tooth removal"
+                        });
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.Categorys.MedicalHistoryStatus", b =>
+            modelBuilder.Entity("JustCare_MB.Models.DentistAppointmentImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("DentistAppointmentImage", (string)null);
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.Gender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArabicType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("EnglishType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Gender", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ArabicType = "ذكر",
+                            EnglishType = "Male"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ArabicType = "انثى",
+                            EnglishType = "Fmale"
+                        });
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.MedicalHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ArabicDisease")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("EnglishDisease")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MedicalHistories");
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.MedicalHistoryStatus", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +236,7 @@ namespace JustCare_MB.Migrations
                     b.ToTable("MedicalHistoryStatus", (string)null);
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.Gender", b =>
+            modelBuilder.Entity("JustCare_MB.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -149,45 +244,47 @@ namespace JustCare_MB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ArabicType")
+                    b.Property<DateTime>("BirthDay")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("EnglishType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Gender", (string)null);
-                });
-
-            modelBuilder.Entity("JustCare_MB.Models.Lookup.MedicalHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("GenderId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<int?>("NationalId")
+                        .HasColumnType("int");
 
-                    b.Property<string>("ArabicDisease")
+                    b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("EnglishDisease")
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserTypeId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("MedicalHistories");
+                    b.HasIndex("GenderId");
+
+                    b.HasIndex("UserTypeId");
+
+                    b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.Lookup.UserType", b =>
+            modelBuilder.Entity("JustCare_MB.Models.UserType", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -208,53 +305,26 @@ namespace JustCare_MB.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserType", (string)null);
-                });
 
-            modelBuilder.Entity("JustCare_MB.Models.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Age")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("GenderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NationalId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int>("PhoneNumber")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("GenderId");
-
-                    b.HasIndex("UserTypeId");
-
-                    b.ToTable("User", (string)null);
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ArabicType = "دكتور اسنان",
+                            EnglishType = "Dentist"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ArabicType = "مريض",
+                            EnglishType = "Patient"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ArabicType = "آدمن",
+                            EnglishType = "Admin"
+                        });
                 });
 
             modelBuilder.Entity("JustCare_MB.Models.Appointment", b =>
@@ -274,11 +344,11 @@ namespace JustCare_MB.Migrations
                     b.Navigation("DentistUser");
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.AppointmentInfo.AppointmentBooked", b =>
+            modelBuilder.Entity("JustCare_MB.Models.AppointmentBooked", b =>
                 {
                     b.HasOne("JustCare_MB.Models.Appointment", "Appointment")
                         .WithOne("AppointmentBooked")
-                        .HasForeignKey("JustCare_MB.Models.AppointmentInfo.AppointmentBooked", "AppointmentId")
+                        .HasForeignKey("JustCare_MB.Models.AppointmentBooked", "AppointmentId")
                         .IsRequired();
 
                     b.HasOne("JustCare_MB.Models.User", "PatientUser")
@@ -291,9 +361,19 @@ namespace JustCare_MB.Migrations
                     b.Navigation("PatientUser");
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.Categorys.MedicalHistoryStatus", b =>
+            modelBuilder.Entity("JustCare_MB.Models.DentistAppointmentImage", b =>
                 {
-                    b.HasOne("JustCare_MB.Models.Lookup.MedicalHistory", "MedicalHistory")
+                    b.HasOne("JustCare_MB.Models.Appointment", "Appointment")
+                        .WithMany("DentistAppointmentImages")
+                        .HasForeignKey("AppointmentId")
+                        .IsRequired();
+
+                    b.Navigation("Appointment");
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.MedicalHistoryStatus", b =>
+                {
+                    b.HasOne("JustCare_MB.Models.MedicalHistory", "MedicalHistory")
                         .WithMany("MedicalHistoryStatuses")
                         .HasForeignKey("MedicalHistoryId")
                         .IsRequired();
@@ -315,7 +395,7 @@ namespace JustCare_MB.Migrations
                         .HasForeignKey("GenderId")
                         .IsRequired();
 
-                    b.HasOne("JustCare_MB.Models.Lookup.UserType", "UserType")
+                    b.HasOne("JustCare_MB.Models.UserType", "UserType")
                         .WithMany("Users")
                         .HasForeignKey("UserTypeId")
                         .IsRequired();
@@ -327,8 +407,9 @@ namespace JustCare_MB.Migrations
 
             modelBuilder.Entity("JustCare_MB.Models.Appointment", b =>
                 {
-                    b.Navigation("AppointmentBooked")
-                        .IsRequired();
+                    b.Navigation("AppointmentBooked");
+
+                    b.Navigation("DentistAppointmentImages");
                 });
 
             modelBuilder.Entity("JustCare_MB.Models.Category", b =>
@@ -341,14 +422,9 @@ namespace JustCare_MB.Migrations
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.Lookup.MedicalHistory", b =>
+            modelBuilder.Entity("JustCare_MB.Models.MedicalHistory", b =>
                 {
                     b.Navigation("MedicalHistoryStatuses");
-                });
-
-            modelBuilder.Entity("JustCare_MB.Models.Lookup.UserType", b =>
-                {
-                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("JustCare_MB.Models.User", b =>
@@ -358,6 +434,11 @@ namespace JustCare_MB.Migrations
                     b.Navigation("Appointments");
 
                     b.Navigation("MedicalHistoryStatuses");
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.UserType", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

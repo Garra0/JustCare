@@ -8,7 +8,7 @@ namespace JustCare_MB.Services.IServices
     {
         Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin);
         Task Register(UserRegisterDto userRegisterDto);
-        Task UpdateUser(int id, UserDto userEdited);
+        Task UpdateUser(UserDto userEdited);
         Task DeleteUser(int id);
         Task<User> GetUserById(int id); 
         Task<UsersIndexDto> GetAllUsers(string? SearchTerm = null);

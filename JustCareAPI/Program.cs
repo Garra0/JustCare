@@ -33,14 +33,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//var sqlConnection = builder.Configuration["ConnectionStrings:Munson:SqlDb"];
-//builder.Services.AddSqlServer<JustCareContext>(sqlConnection, options =>
-//        options.EnableRetryOnFailure());
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddDbContext<JustCareContext>(options =>
-        options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare3;Trusted_Connection=True;"));
+        options.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare;Trusted_Connection=True;"));
 
 builder.Services.AddCors(options =>
 {
@@ -59,7 +55,7 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddAutoMapper(typeof(MappingConfig));
 
 
- 
+
 //JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

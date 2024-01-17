@@ -20,12 +20,14 @@ namespace JustCare_MB.Models
         [StringLength(50)]
         [DisplayFormat(DataFormatString = "User Name")]
         //[RegularExpression("^[\\p{L}\\p{M}'\\.\\-]+( [\\p{L}\\p{M}'\\.\\-]+)*$")]
+        [Required]
         public string FullName { get; set; }// first and last name
         //At least 8 characters in length.
         //At least one uppercase letter.
         //At least one lowercase letter.
         //At least one digit(0-9).
         //Allows common special characters(e.g., !, @, #, $, %, etc.).
+        [Required]
         [StringLength(100)]
         public string Password { get; set; }
         [Required]
@@ -36,7 +38,8 @@ namespace JustCare_MB.Models
         public string PhoneNumber { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
-        public DateTime? Age { get; set; } //
+        [Required]
+        public DateTime BirthDay { get; set; } //
         public int? NationalId { get; set; } // 30818134
 
 

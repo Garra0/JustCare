@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace JustCare_MB.Models
 {
     public class Appointment
-    { 
+    {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Database will generate the ID
         public int Id { get; set; }
@@ -14,6 +14,9 @@ namespace JustCare_MB.Models
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         //public bool State { get; set; }
+        [Required]
+        public string DentistDescription { get; set; }
+
 
         //Relations:
 
@@ -28,6 +31,10 @@ namespace JustCare_MB.Models
 
         // -->
         //public virtual ICollection<AppointmentBooked> AppointmentBookeds { get; set; } = new List<AppointmentBooked>();
-
+        public List<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+     //public void AddImages(ICollection<DentistAppointmentImage> dentistAppointmentImages)
+     //   {
+     //       DentistAppointmentImages= dentistAppointmentImages;
+     //   }
     }
 }
