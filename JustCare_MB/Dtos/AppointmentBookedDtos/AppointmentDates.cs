@@ -11,9 +11,16 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
     {
         public int AppointmentId { get; set; }
         public DateTime Date { get; set; }
-        public List<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        //public List<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        public List<DentistImageDto> Images { get; set; }
         public string DentistDescription { get; set; }
-        public IList<byte[]> images { get; set; }
+        //public IList<byte[]> images { get; set; }
     }
-    
+    public class DentistImageDto
+    {
+        public byte[] ImageData { get; set; }
+        public string ImageName { get; set; }
+
+    }
+
 }

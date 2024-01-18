@@ -63,12 +63,7 @@ namespace JustCare_MB.Migrations
                     b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Note")
+                    b.Property<string>("PatientDescription")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -126,28 +121,6 @@ namespace JustCare_MB.Migrations
                             ArabicName = "خلع اسنان",
                             EnglishName = "Tooth removal"
                         });
-                });
-
-            modelBuilder.Entity("JustCare_MB.Models.DentistAppointmentImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AppointmentId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AppointmentId");
-
-                    b.ToTable("DentistAppointmentImage", (string)null);
                 });
 
             modelBuilder.Entity("JustCare_MB.Models.Gender", b =>
@@ -284,6 +257,33 @@ namespace JustCare_MB.Migrations
                     b.ToTable("User", (string)null);
                 });
 
+            modelBuilder.Entity("JustCare_MB.Models.UserAppointmentImage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AppointmentBookedId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("AppointmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentBookedId");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("UserAppointmentImage", (string)null);
+                });
+
             modelBuilder.Entity("JustCare_MB.Models.UserType", b =>
                 {
                     b.Property<int>("Id")
@@ -361,16 +361,6 @@ namespace JustCare_MB.Migrations
                     b.Navigation("PatientUser");
                 });
 
-            modelBuilder.Entity("JustCare_MB.Models.DentistAppointmentImage", b =>
-                {
-                    b.HasOne("JustCare_MB.Models.Appointment", "Appointment")
-                        .WithMany("DentistAppointmentImages")
-                        .HasForeignKey("AppointmentId")
-                        .IsRequired();
-
-                    b.Navigation("Appointment");
-                });
-
             modelBuilder.Entity("JustCare_MB.Models.MedicalHistoryStatus", b =>
                 {
                     b.HasOne("JustCare_MB.Models.MedicalHistory", "MedicalHistory")
@@ -405,11 +395,31 @@ namespace JustCare_MB.Migrations
                     b.Navigation("UserType");
                 });
 
+            modelBuilder.Entity("JustCare_MB.Models.UserAppointmentImage", b =>
+                {
+                    b.HasOne("JustCare_MB.Models.AppointmentBooked", "AppointmentBooked")
+                        .WithMany("UserAppointmentImages")
+                        .HasForeignKey("AppointmentBookedId");
+
+                    b.HasOne("JustCare_MB.Models.Appointment", "Appointment")
+                        .WithMany("UserAppointmentImages")
+                        .HasForeignKey("AppointmentId");
+
+                    b.Navigation("Appointment");
+
+                    b.Navigation("AppointmentBooked");
+                });
+
             modelBuilder.Entity("JustCare_MB.Models.Appointment", b =>
                 {
                     b.Navigation("AppointmentBooked");
 
-                    b.Navigation("DentistAppointmentImages");
+                    b.Navigation("UserAppointmentImages");
+                });
+
+            modelBuilder.Entity("JustCare_MB.Models.AppointmentBooked", b =>
+                {
+                    b.Navigation("UserAppointmentImages");
                 });
 
             modelBuilder.Entity("JustCare_MB.Models.Category", b =>

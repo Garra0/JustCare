@@ -35,11 +35,11 @@ namespace JustCareAPI.Controllers
         }
 
         [HttpGet("GetAllWaitingApprovalAppointments")]
-        public async Task<ActionResult<IEnumerable<WaitingApprovalAppointmentsBooked>>> GetAllWaitingApprovalAppointments()
+        public async Task<ActionResult<IEnumerable<WaitingApprovalAppointmentsBooked>>> GetAllWaitingApprovalAppointmentsUsingDentistToken()
         {
             IEnumerable<WaitingApprovalAppointmentsBooked>
                 waitingApprovalAppointmentsBookeds
-                = await _appointmentBookedService.GetAllWaitingApprovalAppointments();
+                = await _appointmentBookedService.GetAllWaitingApprovalAppointmentsUsingDentistToken();
 
             return Ok(waitingApprovalAppointmentsBookeds);
         }

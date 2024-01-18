@@ -20,10 +20,7 @@ namespace JustCare_MB.Models
         public string Status { get; set; }
         [StringLength(500)]
         [Required]
-        public string Image { get; set; }
-        [StringLength(500)]
-        [Required]
-        public string Note { get; set; }
+        public string PatientDescription { get; set; }
 
         // relations:
         // Appointment 1:1
@@ -33,8 +30,7 @@ namespace JustCare_MB.Models
         public int PatientUserId { get; set; }
         public User PatientUser { get; set; }
 
+        public ICollection<UserAppointmentImage> UserAppointmentImages { get; set; }
 
-        //-->
-        //public virtual User User { get; set; } = null!;
     }
 }

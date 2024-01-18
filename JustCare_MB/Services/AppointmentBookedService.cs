@@ -41,58 +41,84 @@ namespace JustCare_MB.Services
             _logger.LogInformation(
      $"Create AppointmentBooked: {JsonConvert.SerializeObject(appointmentBookedDto)}");
 
-            if (await _context.AppointmentBookeds.AnyAsync(x => x.AppointmentId == appointmentBookedDto.AppointmentId)
-            )
-                throw new ExistsException("Appointment is exist -_-\"");
+            if (appointmentBookedDto.Images.Count > 5)
+            {
+                throw new ImagesBadRequest("You can upload a maximum of 5 images.");
+            }
+            bool flag = false;
+            foreach (var image in appointmentBookedDto.Images)
+            {
+                if (image.Length > 0)
+                    flag = true;
+                if (image.Length > (5 * 1024 * 1024)) // Assuming 5 MB as the maximum size
+                {
+                    throw new ImagesBadRequest("Each image can have a maximum size of 5 MB.");
+                }
+            }
 
-            if (!await _context.Appointments.AnyAsync(x => x.Id == appointmentBookedDto.AppointmentId))
-                throw new ExistsException("wrong Appointment id");
-
-
-            if (appointmentBookedDto == null)
-                throw new EmptyFieldException("appointmentBookedDto cant be null");
-
-            AppointmentBooked appointmentBooked = _mapper.Map<AppointmentBooked>(appointmentBookedDto);
-
-            // token
             var patientIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
             if (patientIdClaim == null
                 || !int.TryParse(patientIdClaim.Value, out int patientId))
                 throw new NotFoundException("patient token invalid");
 
+            if (await _context.AppointmentBookeds
+                .AnyAsync(x => x.AppointmentId == appointmentBookedDto.AppointmentId))
+                throw new ExistsException("Appointment Booked is exist -_-\"");
+
+            if (!await _context.Appointments.AnyAsync(x => x.Id == appointmentBookedDto.AppointmentId))
+                throw new ExistsException("wrong Appointment id");
+
+            AppointmentBooked appointmentBooked = _mapper.Map<AppointmentBooked>(appointmentBookedDto);
+
+            // token
+
             appointmentBooked.PatientUserId = patientId;
             appointmentBooked.Status = "Appointment booked";
 
-            // upload images... (multiy images)
-            //string imageName = createCategoryDto.EnglishName + ".jpg";
-            //string imagePath = _hostEnvironment.ContentRootPath
-            //    + "\\Images\\Categories\\" + imageName;
-            //// the next 2 lines eqaules to the above
-            ////string im = Path.Combine(_hostEnvironment.ContentRootPath
-            ////    + "Images" + "Categories" + imageName);
-            //imagePath = imagePath.Replace("JustCareAPI", "JustCare_MB"); // Replace from "JustCareAPI" to "JustCare_MB"  
+            appointmentBooked.UserAppointmentImages =
+                new List<UserAppointmentImage>();
 
-            //using (var stream = new FileStream(imagePath, FileMode.Create))
-            //{
-            //    await stream.WriteAsync(createCategoryDto.Image);
-            //}
-
-
+            if (flag)
+            {
+                if (!Directory.Exists("C:\\Images\\UserAppointmentImages"))
+                {
+                    Directory.CreateDirectory("C:\\Images\\UserAppointmentImages");
+                }
+                foreach (var image in appointmentBookedDto.Images)
+                {
+                    string imageName = Guid.NewGuid().ToString() + ".jpg";
+                    UserAppointmentImage patientAppointmentImage
+                     = new UserAppointmentImage
+                     {
+                         ImageName = imageName,
+                     };
+                    appointmentBooked.UserAppointmentImages.Add(patientAppointmentImage);
+                    using (var stream = new FileStream(
+                        "C:\\Images\\UserAppointmentImages\\"
+                        + imageName, FileMode.Create))
+                    {
+                        await stream.WriteAsync(image);
+                    }
+                }
+            }
             await _context.AppointmentBookeds.AddAsync(appointmentBooked);
             await _context.SaveChangesAsync();
         }
 
         // 6-
-        public async Task<IEnumerable<WaitingApprovalAppointmentsBooked>> GetAllWaitingApprovalAppointments()
+        public async Task<IEnumerable<WaitingApprovalAppointmentsBooked>> GetAllWaitingApprovalAppointmentsUsingDentistToken()
         {
             _logger.LogInformation(
      $"Get All Waiting Approval Appointments (appointmentbookeds)");
 
+
             // token
-            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role);
+            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
             if (DentistIdClaim == null
                 || !int.TryParse(DentistIdClaim.Value, out int DentistId))
                 throw new NotFoundException("Dentist token invalid");
+
+
 
             IEnumerable<WaitingApprovalAppointmentsBooked> waitingApprovalAppointmentsBooked =
                 await _context.AppointmentBookeds
@@ -103,10 +129,13 @@ namespace JustCare_MB.Services
                 //.Where(x=> appointmentIdsByDentistUserId.Contains(x.AppointmentId))
                 .Select(x => new WaitingApprovalAppointmentsBooked
                 {
-                    AppointmentBookedId=x.Id,
-                    Image = x.Image,
-                    Note = x.Note,
+                    AppointmentBookedId = x.Id,
+                    PatientDescription = x.PatientDescription,
                     Status = x.Status,
+                    Images = x.UserAppointmentImages.Select(x => new PatienImageDto
+                    {
+                        ImageName = x.ImageName,
+                    }).ToList(),
                     Date = x.Appointment.Date,
                     PatientUser = new PatientUserDtoWaitingApprovalAppointments
                     {
@@ -123,9 +152,23 @@ namespace JustCare_MB.Services
                     }
                 }).OrderBy(e => e.Date).ToListAsync();
 
-            if (waitingApprovalAppointmentsBooked == null)
+            if (!waitingApprovalAppointmentsBooked.Any())
                 throw new NotFoundException
                     ("there are no Approval AppointmentsBooked on waiting");
+
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages"))
+            {
+                foreach (var approvalAppointmentsBooked in waitingApprovalAppointmentsBooked)
+                {
+                    //AppoinmtnetDate.Images = new List<Image>();
+                    foreach (var ImageDto in approvalAppointmentsBooked.Images)
+                    {
+                        string ImagePath = "C:\\Images\\UserAppointmentImages\\"
+                            + ImageDto.ImageName;
+                        ImageDto.ImageData = (await File.ReadAllBytesAsync(ImagePath));
+                    }
+                }
+            }
 
             return waitingApprovalAppointmentsBooked;
         }
@@ -162,11 +205,25 @@ namespace JustCare_MB.Services
                 throw new InvalidIdException("Id is not exist");
 
             AppointmentBooked appointmentBooked = await _context
-              .AppointmentBookeds.FirstAsync(x => x.Id == appointmentBookedId);
+              .AppointmentBookeds.Include(x => x.UserAppointmentImages)
+              .FirstOrDefaultAsync(x => x.Id == appointmentBookedId);
+
+            if (appointmentBooked == null)
+                throw new NotFoundException("appointmentBooked is not exist");
+
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages\\"))
+                foreach (var PatientAppointmentImages in appointmentBooked.UserAppointmentImages)
+                {
+                    if(File.Exists("C:\\Images\\UserAppointmentImages\\"
+                            + PatientAppointmentImages.ImageName))
+                        File.Delete("C:\\Images\\UserAppointmentImages\\" 
+                            + PatientAppointmentImages.ImageName);
+                }
+            _context.RemoveRange(appointmentBooked.UserAppointmentImages);
             _context.AppointmentBookeds.Remove(appointmentBooked);
             await _context.SaveChangesAsync();
         }
-         
+
         public async Task DeleteAppointmentBooked(int appointmentBookedId)
         {
             _logger.LogInformation(
@@ -176,7 +233,18 @@ namespace JustCare_MB.Services
                 throw new InvalidIdException("Id is not exist on AppointmentBooked");
 
             AppointmentBooked appointmentBooked = await _context
-              .AppointmentBookeds.FirstAsync(x => x.Id == appointmentBookedId);
+              .AppointmentBookeds.Include(x => x.UserAppointmentImages)
+              .FirstOrDefaultAsync(x => x.Id == appointmentBookedId);
+
+            if (appointmentBooked == null)
+                throw new NotFoundException("appointmentBooked is not exist");
+
+            foreach (var PatientAppointmentImages in appointmentBooked.UserAppointmentImages)
+            {
+                foreach (var UserImage in PatientAppointmentImages.ImageName)
+                    File.Delete("C:\\Images\\UserAppointmentImages\\" + UserImage);
+            }
+
             _context.AppointmentBookeds.Remove(appointmentBooked);
             await _context.SaveChangesAsync();
         }
@@ -200,36 +268,36 @@ namespace JustCare_MB.Services
 
 
         // to show the use page..
-        public async Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int AppointmentId)
-        {
-            if (!await _context.Appointments.AnyAsync(x => x.Id == AppointmentId))
-                throw new InvalidIdException("id is not exist");
+        //public async Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int AppointmentId)
+        //{
+        //    if (!await _context.Appointments.AnyAsync(x => x.Id == AppointmentId))
+        //        throw new InvalidIdException("id is not exist");
 
-            DateTime date = await _context.Appointments
-                .Where(e => e.Id == AppointmentId).Select(e => e.Date)
-                .FirstAsync();
-            // select category name -> appointment -> categoryId -> categoryName
-            int CategoryId = await _context.Appointments
-                .Where(e => e.Id == AppointmentId).Select(e => e.CategoryId)
-                .FirstAsync();
+        //    DateTime date = await _context.Appointments
+        //        .Where(e => e.Id == AppointmentId).Select(e => e.Date)
+        //        .FirstAsync();
+        //    // select category name -> appointment -> categoryId -> categoryName
+        //    int CategoryId = await _context.Appointments
+        //        .Where(e => e.Id == AppointmentId).Select(e => e.CategoryId)
+        //        .FirstAsync();
 
-            if (!await _context.Categories.AnyAsync(x => x.Id == CategoryId))
-                throw new InvalidIdException("id is not exist");
+        //    if (!await _context.Categories.AnyAsync(x => x.Id == CategoryId))
+        //        throw new InvalidIdException("id is not exist");
 
-            string CategoryName = await _context.Categories.
-                Where(e => e.Id == CategoryId).Select(e => e.ArabicName).FirstAsync();
+        //    string CategoryName = await _context.Categories.
+        //        Where(e => e.Id == CategoryId).Select(e => e.ArabicName).FirstAsync();
 
-            CreateAppointmentBookedDto dto = new CreateAppointmentBookedDto();
-            dto.CategoryName = CategoryName;
-            dto.AppointmentId = AppointmentId;
-            dto.Date = date;
-            return dto;
+        //    CreateAppointmentBookedDto dto = new CreateAppointmentBookedDto();
+        //    dto.CategoryName = CategoryName;
+        //    dto.AppointmentId = AppointmentId;
+        //    dto.Date = date;
+        //    return dto;
 
-        }
+        //}
 
 
 
-       
+
 
         public Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto)
         {

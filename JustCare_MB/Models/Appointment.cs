@@ -31,7 +31,7 @@ namespace JustCare_MB.Models
 
         // -->
         //public virtual ICollection<AppointmentBooked> AppointmentBookeds { get; set; } = new List<AppointmentBooked>();
-        public List<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        public ICollection<UserAppointmentImage> UserAppointmentImages { get; set; }
      //public void AddImages(ICollection<DentistAppointmentImage> dentistAppointmentImages)
      //   {
      //       DentistAppointmentImages= dentistAppointmentImages;

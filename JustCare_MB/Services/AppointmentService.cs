@@ -2,7 +2,6 @@
 using JustCare_MB.Data;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
-using JustCare_MB.Dtos.Category;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
@@ -11,10 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Net.Mail;
-using System.Security.Claims;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace JustCare_MB.Services
 {
@@ -67,63 +62,51 @@ namespace JustCare_MB.Services
             if (appointmentDto.Date < DateTime.Now.AddHours(12))
                 throw new TimeNotValid("The appointment must be at least 12 hours away");
 
+            bool flag = false;
             foreach (var image in appointmentDto.Images)
             {
+                if(image.Length>0)
+                    flag = true;
                 if (image.Length > (5 * 1024 * 1024)) // Assuming 5 MB as the maximum size
                 {
                     throw new ImagesBadRequest("Each image can have a maximum size of 5 MB.");
                 }
             }
 
-
-
             Appointment appointment = _mapper.Map<Appointment>(appointmentDto);
             appointment.DentistUserId = dentistUserId;
 
-            appointment.DentistAppointmentImages =
-                new List<DentistAppointmentImage>();
+            appointment.UserAppointmentImages =
+                new List<UserAppointmentImage>();
 
-
-
-            //string fileName = "\\8845806b-91ea-413b-8a93-b4fc9459c678.jpg";
-            //string filePath = Path.Combine(basePath, subfolder, fileName);
-
-            // Check if the directory exists, if not, create it
-            //string directoryPath = Path.Combine(basePath, subfolder);
-            // create the folders Created
-            if (!Directory.Exists("C:\\Images\\DentistAppointmentImages"))
+            if (flag)
             {
-                Directory.CreateDirectory("C:\\Images\\DentistAppointmentImages");
-            }
-
-            //// Now you can save the file to the specified path
-            //using (var stream = new FileStream(filePath, FileMode.Create))
-            //{
-            //    file.CopyTo(stream);
-            //}
-            
-            foreach (var image in appointmentDto.Images)
-            {
-                string imagePath = "C:\\Images\\DentistAppointmentImages\\";
-                string imageName = Guid.NewGuid().ToString() + ".jpg";
-                //string imagePath = _hostEnvironment.ContentRootPath
-                //    + "\\Images\\DentistAppointmentImages\\" + imageName;
-                //imagePath = imagePath.Replace("JustCareAPI", "JustCare_MB"); // Replace from "JustCareAPI" to "JustCare_MB"  
-                // add the image name to the path
-                imagePath += imageName;
-                DentistAppointmentImage dentistAppointmentImage
-                 = new DentistAppointmentImage
-                 {
-                     ImageName = imageName,
-                 };
-                appointment.DentistAppointmentImages.Add(dentistAppointmentImage);
-
-                using (var stream = new FileStream(imagePath, FileMode.Create))
+                if (!Directory.Exists("C:\\Images\\UserAppointmentImages"))
                 {
-                    //await stream.WriteAsync(Encoding.UTF8.GetBytes(image));
-                    await stream.WriteAsync(image);
+                    Directory.CreateDirectory("C:\\Images\\UserAppointmentImages");
                 }
+                foreach (var image in appointmentDto.Images)
+                {
+                    string imagePath = "C:\\Images\\UserAppointmentImages\\";
+                    string imageName = Guid.NewGuid().ToString() + ".jpg";
+                    //string imagePath = _hostEnvironment.ContentRootPath
+                    //    + "\\Images\\DentistAppointmentImages\\" + imageName;
+                    //imagePath = imagePath.Replace("JustCareAPI", "JustCare_MB"); // Replace from "JustCareAPI" to "JustCare_MB"  
+                    // add the image name to the path
+                    imagePath += imageName;
+                    UserAppointmentImage dentistAppointmentImage
+                     = new UserAppointmentImage
+                     {
+                         ImageName = imageName,
+                     };
+                    appointment.UserAppointmentImages.Add(dentistAppointmentImage);
 
+                    using (var stream = new FileStream(imagePath, FileMode.Create))
+                    {
+                        await stream.WriteAsync(image);
+                    }
+
+                }
             }
             await _context.Appointments.AddAsync(appointment);
             _context.SaveChanges();
@@ -141,9 +124,8 @@ namespace JustCare_MB.Services
 
             if (!await _context.Appointments.AnyAsync())
                 throw new NotFoundException("There are no appointments");
-
-            DatesDto datesDto = await GetAllAvailableAppointmentByCategoryId(CategoryId);
-            return datesDto;
+             
+            return await GetAllAvailableAppointmentByCategoryId(CategoryId);
         }
 
         //4.2
@@ -162,40 +144,49 @@ namespace JustCare_MB.Services
             {
                 AppointmentId = e.Id,
                 Date = e.Date,
-                DentistAppointmentImages = e.DentistAppointmentImages,
+                Images = e.UserAppointmentImages.Select(x=> new DentistImageDto
+                {
+                    ImageName = x.ImageName
+                }).ToList(),
                 DentistDescription = e.DentistDescription,
             }
             )
             .OrderBy(e => e.Date)
             .ToListAsync();
 
-            if (AppointmentDatesByCategoryId == null)
+            if (!AppointmentDatesByCategoryId.Any())
                 throw new NotFoundException("There are no Appointments by this Category");
 
             string CategoryName = await _context.Categories
                 .Where(e => e.Id == CategoryId)
                 .Select(x => x.ArabicName).FirstAsync();
 
-            if (Directory.Exists("C:\\Images\\DentistAppointmentImages"))
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages"))
             {
                 foreach (var AppoinmtnetDate in AppointmentDatesByCategoryId)
                 {
-                    AppoinmtnetDate.images = new List<byte[]>();
-                    foreach (var dentistAppointment in AppoinmtnetDate.DentistAppointmentImages)
+                    //AppoinmtnetDate.Images = new List<Image>();
+                    foreach (var ImageDto in AppoinmtnetDate.Images)
                     {
-                        string ImagePath = "C:\\Images\\DentistAppointmentImages\\" 
-                            + dentistAppointment.ImageName;
-                        AppoinmtnetDate.images.Add(await File.ReadAllBytesAsync(ImagePath));
+                        string ImagePath = "C:\\Images\\UserAppointmentImages\\"
+                            + ImageDto.ImageName;
+                        ImageDto.ImageData=(await File.ReadAllBytesAsync(ImagePath));
                     }
                 }
             }
-
             DatesDto dto = new DatesDto();
             dto.CategoryId = CategoryId;
             dto.CategoryName = CategoryName;
             dto.appointmentDates = AppointmentDatesByCategoryId;
             return dto;
         }
+
+
+
+
+
+
+
 
         public async Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int CategorId)
         {

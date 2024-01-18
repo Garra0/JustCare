@@ -23,7 +23,7 @@ namespace JustCare_MB.Data
 
         public DbSet<MedicalHistory> MedicalHistories { get; set; }
 
-        public DbSet<DentistAppointmentImage> DentistAppointmentImages { get; set; }
+        public DbSet<UserAppointmentImage> DentistAppointmentImages { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
        => optionsBuilder.UseSqlServer("Server=(localdb)\\MSSQLLocalDB;Database=JustCare;Trusted_Connection=True;");
 
@@ -107,7 +107,7 @@ namespace JustCare_MB.Data
                 entity.HasOne(u => u.Appointment)
                .WithOne(u => u.AppointmentBooked)
                 // .HasForeignKey(u => u.AppointmentId)
-               .OnDelete(DeleteBehavior.ClientSetNull);
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Gender>(entity =>
@@ -136,13 +136,13 @@ namespace JustCare_MB.Data
                .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
-            modelBuilder.Entity<DentistAppointmentImage>(entity =>
+            modelBuilder.Entity<UserAppointmentImage>(entity =>
             {
                 entity.HasKey(u => u.Id);
-                entity.ToTable("DentistAppointmentImage");
+                entity.ToTable("UserAppointmentImage");
 
                 entity.HasOne(u => u.Appointment)
-                .WithMany(u => u.DentistAppointmentImages)
+                .WithMany(u => u.UserAppointmentImages)
                 .HasForeignKey(u => u.AppointmentId)
                 .OnDelete(DeleteBehavior.ClientSetNull);
             });
