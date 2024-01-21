@@ -180,8 +180,32 @@ namespace JustCare_MB.Services
             dto.appointmentDates = AppointmentDatesByCategoryId;
             return dto;
         }
+        public async Task DeleteAppointment(int appointmentId)
+        {
+            _logger.LogInformation(
+      $"Delete Appointment: {JsonConvert.SerializeObject(appointmentId)}");
 
+            if (!await _context.Appointments.AnyAsync(x => x.Id == appointmentId))
+                throw new InvalidIdException("Id is not exist on Appointment");
 
+            Appointment appointment = await _context
+              .Appointments.Include(x=>x.UserAppointmentImages)
+              .FirstOrDefaultAsync(x => x.Id == appointmentId);
+            if (appointment == null)
+                throw new NotFoundException("appointment is not exist on DB");
+
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages\\"))
+                foreach (var DentistAppointmentImages in appointment.UserAppointmentImages)
+                {
+                    if (File.Exists("C:\\Images\\UserAppointmentImages\\"
+                            + DentistAppointmentImages.ImageName))
+                        File.Delete("C:\\Images\\UserAppointmentImages\\"
+                            + DentistAppointmentImages.ImageName);
+                }
+            _context.RemoveRange(appointment.UserAppointmentImages);
+            _context.Appointments.Remove(appointment);
+            await _context.SaveChangesAsync();
+        }
 
 
 
@@ -199,22 +223,7 @@ namespace JustCare_MB.Services
             return createAppointmentDto;
         }
 
-        public async Task DeleteAppointment(int appointmentId)
-        {
-            _logger.LogInformation(
-      $"Delete Appointment: {JsonConvert.SerializeObject(appointmentId)}");
-
-            if (!await _context.Appointments.AnyAsync(x => x.Id == appointmentId))
-                throw new InvalidIdException("Id is not exist on Appointment");
-
-            Appointment appointment = await _context
-              .Appointments.FirstAsync(x => x.Id == appointmentId);
-            if (appointment == null)
-                throw new NotFoundException("appointment is not exist on DB");
-
-            _context.Appointments.Remove(appointment);
-            await _context.SaveChangesAsync();
-        }
+       
 
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
         {
