@@ -188,6 +188,10 @@ namespace JustCare_MB.Services
             if (!await _context.Appointments.AnyAsync(x => x.Id == appointmentId))
                 throw new InvalidIdException("Id is not exist on Appointment");
 
+            if (await _context.AppointmentBookeds
+                .AnyAsync(x => x.AppointmentId == appointmentId))
+                throw new ExistsException("This appointment cannot be removed because it is already booked");
+
             Appointment appointment = await _context
               .Appointments.Include(x=>x.UserAppointmentImages)
               .FirstOrDefaultAsync(x => x.Id == appointmentId);

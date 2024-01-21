@@ -214,9 +214,9 @@ namespace JustCare_MB.Services
             if (Directory.Exists("C:\\Images\\UserAppointmentImages\\"))
                 foreach (var PatientAppointmentImages in appointmentBooked.UserAppointmentImages)
                 {
-                    if(File.Exists("C:\\Images\\UserAppointmentImages\\"
+                    if (File.Exists("C:\\Images\\UserAppointmentImages\\"
                             + PatientAppointmentImages.ImageName))
-                        File.Delete("C:\\Images\\UserAppointmentImages\\" 
+                        File.Delete("C:\\Images\\UserAppointmentImages\\"
                             + PatientAppointmentImages.ImageName);
                 }
             _context.RemoveRange(appointmentBooked.UserAppointmentImages);
@@ -239,12 +239,15 @@ namespace JustCare_MB.Services
             if (appointmentBooked == null)
                 throw new NotFoundException("appointmentBooked is not exist");
 
-            foreach (var PatientAppointmentImages in appointmentBooked.UserAppointmentImages)
-            {
-                foreach (var UserImage in PatientAppointmentImages.ImageName)
-                    File.Delete("C:\\Images\\UserAppointmentImages\\" + UserImage);
-            }
-
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages\\"))
+                foreach (var PatientAppointmentImages in appointmentBooked.UserAppointmentImages)
+                {
+                    if (File.Exists("C:\\Images\\UserAppointmentImages\\"
+                            + PatientAppointmentImages.ImageName))
+                        File.Delete("C:\\Images\\UserAppointmentImages\\"
+                        + PatientAppointmentImages.ImageName);
+                }
+            _context.RemoveRange(appointmentBooked.UserAppointmentImages);
             _context.AppointmentBookeds.Remove(appointmentBooked);
             await _context.SaveChangesAsync();
         }
