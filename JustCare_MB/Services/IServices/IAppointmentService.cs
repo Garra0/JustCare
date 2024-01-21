@@ -9,6 +9,7 @@ namespace JustCare_MB.Services.IServices
         Task CreateAppointment(CreateAppointmentDto appointmentDto);
         Task<DatesDto> GetAllAppoitnmentDatesDtoByCategoryId(int CategoryId);
         Task DeleteAppointment(int appointmentId);
+        Task<UpdateAppointmentDto> GetAppointmentById(int appointmentId);
         Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto);
         Task<IEnumerable<AppointmentDto>> GetAllAppointments();
         Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);

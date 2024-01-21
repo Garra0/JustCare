@@ -15,5 +15,6 @@ namespace JustCare_MB.Dtos.AppointmentDtos
         public DateTime Date { get; set; }
         public int DentistUserId { get; set; }
         public string CategoryArabicName { get; set; }
+        public string CategoryEnglishName { get; set; }
     }
 }

@@ -52,8 +52,12 @@ namespace JustCareAPI.Controllers
             return Ok();
 
         }
-
-
+        [HttpGet("GetAppointmentById/{Id:int}")]
+        public async Task<IActionResult> GetAppointmentById(int Id)
+        {
+            UpdateAppointmentDto updateAppointmentDto = await _appointmentService.GetAppointmentById(Id);
+            return Ok(updateAppointmentDto);
+        }
 
 
 

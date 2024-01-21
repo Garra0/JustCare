@@ -210,6 +210,21 @@ namespace JustCare_MB.Services
             _context.Appointments.Remove(appointment);
             await _context.SaveChangesAsync();
         }
+        public async Task<UpdateAppointmentDto> GetAppointmentById(int Id)
+        {
+            if (!await _context.Appointments.AnyAsync(x => x.Id == Id))
+                throw new InvalidIdException("id is not exist");
+
+            Appointment appointment =
+                await _context.Appointments
+                .FirstOrDefaultAsync(x => x.Id == Id);
+
+            UpdateAppointmentDto appointmentDto = 
+                _mapper.Map<UpdateAppointmentDto>(appointment);
+
+            return appointmentDto;
+
+        }
 
 
 
@@ -238,7 +253,8 @@ namespace JustCare_MB.Services
                     Id = x.Id,
                     Date = x.Date,
                     DentistUserId = x.DentistUserId,
-                    CategoryArabicName = x.Category.ArabicName
+                    CategoryArabicName = x.Category.ArabicName,
+                    CategoryEnglishName = x.Category.EnglishName,
                 })
                 .OrderBy(e => e.Date)
                 .ToListAsync();
@@ -247,21 +263,26 @@ namespace JustCare_MB.Services
 
         }
 
-        public async Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
+        public Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
         {
-            if (updateAppointmentDto == null || updateAppointmentDto.Id != id)
-                throw new Exception("information is null or the id is deffrinet");
-
-            Appointment appointment = await _context.Appointments.FindAsync(id);
-            if (appointment == null)
-            {
-                throw new Exception("appointment not found");
-            }
-
-            _mapper.Map(updateAppointmentDto, appointment);
-            _context.Appointments.Update(appointment);
-            await _context.SaveChangesAsync();
+            throw new NotImplementedException();
         }
+
+        //public async Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
+        //{
+        //    if (updateAppointmentDto == null || updateAppointmentDto.Id != id)
+        //        throw new Exception("information is null or the id is deffrinet");
+
+        //    Appointment appointment = await _context.Appointments.FindAsync(id);
+        //    if (appointment == null)
+        //    {
+        //        throw new Exception("appointment not found");
+        //    }
+
+        //    _mapper.Map(updateAppointmentDto, appointment);
+        //    _context.Appointments.Update(appointment);
+        //    await _context.SaveChangesAsync();
+        //}
 
 
     }

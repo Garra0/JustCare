@@ -11,12 +11,14 @@ namespace JustCare_MB.Dtos.AppointmentDtos
 {
     public class UpdateAppointmentDto
     {
-        public int Id { get; set; }
+        //public int Id { get; set; }
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}"
             , ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
-        public int DentistUserId { get; set; }
-        public int CategoryId { get; set; }
+        [Required]
+        public string DentistDescription { get; set; }
+
     }
+    
 }
