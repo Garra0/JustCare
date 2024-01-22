@@ -248,6 +248,57 @@ namespace JustCare_MB.Services
             _context.Appointments.Update(appointment);
             await _context.SaveChangesAsync();
         }
+        public async Task<IEnumerable<GetMyAppointments>> MyAppointmentsByDintistToken()
+        {
+            _logger.LogInformation(
+               "My Appointments By Dintist Token");
+
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (userIdClaim == null
+                || !int.TryParse(userIdClaim.Value, out int dentistUserId))
+                throw new NotFoundException("The token invalid");
+
+            //Where(e => e.Id != e.AppointmentBooked.AppointmentId
+
+            IEnumerable<GetMyAppointments> MyAppointmentDto =
+                await _context.Appointments
+                .Where(x=>x.DentistUserId== dentistUserId)
+                .Select(x => new GetMyAppointments
+                {
+                    Id = x.Id,
+                    Date = x.Date,
+                    CategoryArabicName = x.Category.ArabicName,
+                    CategoryEnglishName = x.Category.EnglishName,
+                    DentistDescription = x.DentistDescription,
+                    Images =  x.UserAppointmentImages.Select(e=> new MyAppointmentImageDto
+                    {
+                        ImageName = e.ImageName,
+                    }).ToList()
+                })
+                .OrderBy(e => e.Date)
+                .ToListAsync();
+
+            if (!MyAppointmentDto.Any())
+                throw new NotFoundException("There are no Appointments for this Dintist token");
+
+            if (Directory.Exists("C:\\Images\\UserAppointmentImages\\"))
+                foreach (var DentistAppointmentImages in MyAppointmentDto)
+                {
+                    foreach (var myAppointmentImageDto in DentistAppointmentImages.Images)
+                    {
+                        if (File.Exists("C:\\Images\\UserAppointmentImages\\"
+                            + myAppointmentImageDto.ImageName))
+                            myAppointmentImageDto.ImageData = 
+                                await File.ReadAllBytesAsync("C:\\Images\\UserAppointmentImages\\"
+                            + myAppointmentImageDto.ImageName);
+                    }
+                }
+                return MyAppointmentDto;
+        }
+
+
+
+
 
 
 
@@ -266,24 +317,7 @@ namespace JustCare_MB.Services
 
 
 
-        public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
-        {
-            IEnumerable<AppointmentDto> appointmentDto =
-                await _context.Appointments
-                .Select(x => new AppointmentDto
-                {
-                    Id = x.Id,
-                    Date = x.Date,
-                    DentistUserId = x.DentistUserId,
-                    CategoryArabicName = x.Category.ArabicName,
-                    CategoryEnglishName = x.Category.EnglishName,
-                })
-                .OrderBy(e => e.Date)
-                .ToListAsync();
-
-            return appointmentDto;
-
-        }
+        
 
 
 

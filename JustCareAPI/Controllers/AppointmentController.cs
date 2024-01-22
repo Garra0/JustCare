@@ -39,9 +39,9 @@ namespace JustCareAPI.Controllers
 
 
         [HttpGet]
-        public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
+        public async Task<IEnumerable<GetMyAppointments>> GetAllAppointments()
         {
-            IEnumerable<AppointmentDto> appointmentDtos = await _appointmentService.GetAllAppointments();
+            IEnumerable<GetMyAppointments> appointmentDtos = await _appointmentService.MyAppointmentsByDintistToken();
             return appointmentDtos;
         }
 
@@ -63,7 +63,11 @@ namespace JustCareAPI.Controllers
             await _appointmentService.UpdateAppointment(id, appointmentDto);
             return Ok();
         }
-
+        [HttpGet("MyAppointmentsByDintistToken")]
+        public async Task<IActionResult> MyAppointmentsByDintistToken()
+        { 
+            return Ok(await _appointmentService.MyAppointmentsByDintistToken());
+        }
 
 
 
@@ -71,13 +75,7 @@ namespace JustCareAPI.Controllers
         //Task<Category> getCategoryObject(int id);
         //Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);
 
-        [HttpGet("MyAppointments")]
-        public async Task<IActionResult> MyAppointments()
-        {
-            IEnumerable<AppointmentDto> AppointmentList;
-            AppointmentList = await _appointmentService.GetAllAppointments();
-            return Ok(AppointmentList);
-        }
+
 
         //public async Task<IActionResult> AcceptBooking()
         //{
