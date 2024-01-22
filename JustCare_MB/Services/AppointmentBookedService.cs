@@ -251,7 +251,25 @@ namespace JustCare_MB.Services
             _context.AppointmentBookeds.Remove(appointmentBooked);
             await _context.SaveChangesAsync();
         }
+        public async Task UpdateAppointmentBooked(int Id, UpdateAppointmentBookedDto updateAppointmentBookedDto)
+        {
+            if (updateAppointmentBookedDto == null)
+                throw new EmptyFieldException("updateAppointment has Empty Field Exception");
 
+            if (!await _context.AppointmentBookeds.AnyAsync(x => x.Id == Id))
+                throw new InvalidIdException("Id is not exist on AppointmentBookeds");
+
+            AppointmentBooked appointmentBooked = await _context.AppointmentBookeds
+                .FirstOrDefaultAsync(x => x.Id == Id);
+            if (appointmentBooked == null)
+            {
+                throw new NotFoundException("appointment not found");
+            }
+
+            _mapper.Map(updateAppointmentBookedDto, appointmentBooked);
+            _context.AppointmentBookeds.Update(appointmentBooked);
+            await _context.SaveChangesAsync();
+        }
 
 
 
@@ -300,12 +318,6 @@ namespace JustCare_MB.Services
 
 
 
-
-
-        public Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto)
-        {
-            throw new NotImplementedException();
-        }
 
         public async Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken()
         {

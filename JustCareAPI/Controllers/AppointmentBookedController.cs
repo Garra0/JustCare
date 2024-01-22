@@ -65,13 +65,13 @@ namespace JustCareAPI.Controllers
             return Ok();
 
         }
+        [HttpPut("UpdateAppointmentBooked/{id:int}", Name = "UpdateAppointmentBooked")]
+        public async Task<IActionResult> UpdateAppointmentBooked(int id, UpdateAppointmentBookedDto updateAppointmentBookedDto)
+        {
+            await _appointmentBookedService.UpdateAppointmentBooked(id, updateAppointmentBookedDto);
+            return Ok();
+        }
 
-        //[HttpPut("{id:int}", Name = "UpdateAppointment")]
-        //public Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto)
-        //{
-        ////    await _appointmentService.UpdateAppointment(id, appointmentDto);
-        ////    return Ok();
-        //}
 
         //Task CreateAppointmentBooked(CreateAppointmentBookedDto appointmentBookedDto);
         //Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto);

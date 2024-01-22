@@ -55,20 +55,18 @@ namespace JustCareAPI.Controllers
         [HttpGet("GetAppointmentById/{Id:int}")]
         public async Task<IActionResult> GetAppointmentById(int Id)
         {
-            UpdateAppointmentDto updateAppointmentDto = await _appointmentService.GetAppointmentById(Id);
-            return Ok(updateAppointmentDto);
+            return Ok(await _appointmentService.GetAppointmentById(Id));
         }
-
-
-
-
-
-        [HttpPut("{id:int}", Name = "UpdateAppointment")]
+        [HttpPut("UpdateAppointment/{id:int}", Name = "UpdateAppointment")]
         public async Task<IActionResult> UpdateAppointment(int id, UpdateAppointmentDto appointmentDto)
         {
             await _appointmentService.UpdateAppointment(id, appointmentDto);
             return Ok();
         }
+
+
+
+
 
         //Task<Category> getCategoryObject(int id);
         //Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);

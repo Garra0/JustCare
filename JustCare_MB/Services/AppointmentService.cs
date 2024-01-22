@@ -65,7 +65,7 @@ namespace JustCare_MB.Services
             bool flag = false;
             foreach (var image in appointmentDto.Images)
             {
-                if(image.Length>0)
+                if (image.Length > 0)
                     flag = true;
                 if (image.Length > (5 * 1024 * 1024)) // Assuming 5 MB as the maximum size
                 {
@@ -124,7 +124,7 @@ namespace JustCare_MB.Services
 
             if (!await _context.Appointments.AnyAsync())
                 throw new NotFoundException("There are no appointments");
-             
+
             return await GetAllAvailableAppointmentByCategoryId(CategoryId);
         }
 
@@ -144,7 +144,7 @@ namespace JustCare_MB.Services
             {
                 AppointmentId = e.Id,
                 Date = e.Date,
-                Images = e.UserAppointmentImages.Select(x=> new DentistImageDto
+                Images = e.UserAppointmentImages.Select(x => new DentistImageDto
                 {
                     ImageName = x.ImageName
                 }).ToList(),
@@ -170,7 +170,7 @@ namespace JustCare_MB.Services
                     {
                         string ImagePath = "C:\\Images\\UserAppointmentImages\\"
                             + ImageDto.ImageName;
-                        ImageDto.ImageData=(await File.ReadAllBytesAsync(ImagePath));
+                        ImageDto.ImageData = (await File.ReadAllBytesAsync(ImagePath));
                     }
                 }
             }
@@ -193,7 +193,7 @@ namespace JustCare_MB.Services
                 throw new ExistsException("This appointment cannot be removed because it is already booked");
 
             Appointment appointment = await _context
-              .Appointments.Include(x=>x.UserAppointmentImages)
+              .Appointments.Include(x => x.UserAppointmentImages)
               .FirstOrDefaultAsync(x => x.Id == appointmentId);
             if (appointment == null)
                 throw new NotFoundException("appointment is not exist on DB");
@@ -219,13 +219,35 @@ namespace JustCare_MB.Services
                 await _context.Appointments
                 .FirstOrDefaultAsync(x => x.Id == Id);
 
-            UpdateAppointmentDto appointmentDto = 
+            UpdateAppointmentDto appointmentDto =
                 _mapper.Map<UpdateAppointmentDto>(appointment);
 
             return appointmentDto;
 
         }
+        public async Task UpdateAppointment(int Id, UpdateAppointmentDto updateAppointmentDto)
+        {
+            if (updateAppointmentDto == null)
+                throw new EmptyFieldException("updateAppointment has Empty Field Exception");
 
+            if (!await _context.Appointments.AnyAsync(x => x.Id == Id))
+                throw new InvalidIdException("Id is not exist on Appointment");
+
+            if (updateAppointmentDto.Date < DateTime.Now.AddHours(12))
+                throw new TimeNotValid("The appointment must be at least 12 hours away");
+
+
+            Appointment appointment = await _context.Appointments
+                .FirstOrDefaultAsync(x=>x.Id==Id);
+            if (appointment == null)
+            {
+                throw new NotFoundException("appointment not found");
+            }
+
+            _mapper.Map(updateAppointmentDto, appointment);
+            _context.Appointments.Update(appointment);
+            await _context.SaveChangesAsync();
+        }
 
 
 
@@ -242,7 +264,7 @@ namespace JustCare_MB.Services
             return createAppointmentDto;
         }
 
-       
+
 
         public async Task<IEnumerable<AppointmentDto>> GetAllAppointments()
         {
@@ -263,26 +285,7 @@ namespace JustCare_MB.Services
 
         }
 
-        public Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
-        {
-            throw new NotImplementedException();
-        }
 
-        //public async Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto)
-        //{
-        //    if (updateAppointmentDto == null || updateAppointmentDto.Id != id)
-        //        throw new Exception("information is null or the id is deffrinet");
-
-        //    Appointment appointment = await _context.Appointments.FindAsync(id);
-        //    if (appointment == null)
-        //    {
-        //        throw new Exception("appointment not found");
-        //    }
-
-        //    _mapper.Map(updateAppointmentDto, appointment);
-        //    _context.Appointments.Update(appointment);
-        //    await _context.SaveChangesAsync();
-        //}
 
 
     }
