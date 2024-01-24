@@ -2,6 +2,7 @@
 using JustCare_MB.Data;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
+using JustCare_MB.Dtos.Category;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
@@ -328,7 +329,6 @@ namespace JustCare_MB.Services
                 throw new NotFoundException("There are no Appointments not booked yet for this Dintist");
 
             return myAppointmentsByDintistTokenDto;
-
         }
 
 

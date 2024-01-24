@@ -145,7 +145,7 @@ namespace JustCare_MB.Services
                         NationalId = x.PatientUser.NationalId,
                         UserType = x.PatientUser.UserType.ArabicType,
                         Gender = x.PatientUser.Gender.ArabicType,
-                        PatientName=x.PatientUser.FullName
+                        PatientName = x.PatientUser.FullName
                     },
                     Category = new CategoryDtoWaitingApprovalAppointments
                     {
@@ -189,10 +189,10 @@ namespace JustCare_MB.Services
             if (appointmentBooked == null)
                 throw new InvalidIdException("the appointmentId is wrong");
 
-            if (appointmentBooked.Status == "Accepted")
+            if (appointmentBooked.Status == "Active")
                 throw new ExistsException("This appoitnmentBooked have been accepted");
 
-            appointmentBooked.Status = "Accepted";
+            appointmentBooked.Status = "Active";
             _context.AppointmentBookeds.Update(appointmentBooked);
             await _context.SaveChangesAsync();
         }
@@ -272,8 +272,100 @@ namespace JustCare_MB.Services
             _context.AppointmentBookeds.Update(appointmentBooked);
             await _context.SaveChangesAsync();
         }
+        // Active Appointment Booked for Dentist page
+        public async Task<IEnumerable<ActiveAppointmentBookedForDentistDto>> GetAllActiveAppointmentBookedForDentist()
+        {
+            _logger.LogInformation(
+     $"Get All Get All Active AppointmentBooked For Dentist");
+
+            // token
+            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (DentistIdClaim == null
+                || !int.TryParse(DentistIdClaim.Value, out int DentistId))
+                throw new NotFoundException("User token invalid");
+
+            IEnumerable<ActiveAppointmentBookedForDentistDto> activeAppointmentBookedDto =
+                await _context.AppointmentBookeds
+                .Where(x => x.Status == "Active")
+                .Where(x => x.Appointment.DentistUserId == DentistId
+                && x.Appointment.Id == x.Appointment.AppointmentBooked.AppointmentId)
+                .Select(x => new ActiveAppointmentBookedForDentistDto
+                {
+                    appointmentDto = new AppointmentDtoActiveAppointmentBookedDto
+                    {
+
+                        Id = x.Id,
+                        Date = x.Appointment.Date,
+                        categoryName = new CategoryName
+                        {
+                            ArabicName = x.Appointment.Category.ArabicName,
+                            EnglishName = x.Appointment.Category.EnglishName,
+                        }
+                    },
+                    userDto = new patientInformationActiveAppointmentBooked
+                    {
+                        patientId = x.PatientUserId,
+                        FullName = x.PatientUser.FullName,
+                        PhoneNumber = x.PatientUser.PhoneNumber
+                    }
+                }
+
+                ).OrderBy(x => x.appointmentDto.Date).ToListAsync();
+
+            if (!activeAppointmentBookedDto.Any())
+                throw new NotFoundException
+                    ("there are no active AppointmentsBooked yet");
+
+            return activeAppointmentBookedDto;
+        }
 
 
+     //   // Active Appointment Booked for patient page
+     //   public async Task<IEnumerable<ActiveAppointmentBookedForDentistDto>> GetAllActiveAppointmentBookedForPatient()
+     //   {
+     //       _logger.LogInformation(
+     //$"Get All Get All Active AppointmentBooked For Dentist");
+
+     //       // token
+     //       var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+     //       if (DentistIdClaim == null
+     //           || !int.TryParse(DentistIdClaim.Value, out int DentistId))
+     //           throw new NotFoundException("User token invalid");
+
+     //       IEnumerable<ActiveAppointmentBookedForDentistDto> activeAppointmentBookedDto =
+     //           await _context.AppointmentBookeds
+     //           .Where(x => x.Status == "Active")
+     //           .Where(x => x.Appointment.DentistUserId == DentistId
+     //           && x.Appointment.Id == x.Appointment.AppointmentBooked.AppointmentId)
+     //           .Select(x => new ActiveAppointmentBookedForDentistDto
+     //           {
+     //               appointmentDto = new AppointmentDtoActiveAppointmentBookedDto
+     //               {
+
+     //                   Id = x.Id,
+     //                   Date = x.Appointment.Date,
+     //                   categoryName = new CategoryName
+     //                   {
+     //                       ArabicName = x.Appointment.Category.ArabicName,
+     //                       EnglishName = x.Appointment.Category.EnglishName,
+     //                   }
+     //               },
+     //               userDto = new DentistInformationActiveAppointmentBooked
+     //               {
+     //                   DentistId = x.Appointment.DentistUserId,
+     //                   FullName = x.Appointment.DentistUser.FullName,
+     //                   PhoneNumber = x.Appointment.DentistUser.PhoneNumber
+     //               }
+     //           }
+
+     //           ).OrderBy(x => x.appointmentDto.Date).ToListAsync();
+
+     //       if (!activeAppointmentBookedDto.Any())
+     //           throw new NotFoundException
+     //               ("there are no active AppointmentsBooked yet");
+
+     //       return activeAppointmentBookedDto;
+     //   }
 
 
 
@@ -321,7 +413,7 @@ namespace JustCare_MB.Services
 
 
 
-     
+
 
 
     }

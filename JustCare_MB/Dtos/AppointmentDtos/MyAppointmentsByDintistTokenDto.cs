@@ -1,4 +1,6 @@
-﻿namespace JustCare_MB.Dtos.AppointmentDtos
+﻿using JustCare_MB.Dtos.Category;
+
+namespace JustCare_MB.Dtos.AppointmentDtos
 {
     public class MyAppointmentsByDintistTokenDto
     {
@@ -7,9 +9,5 @@
         public DateTime Date { get; set; }
         public CategoryName categoryName { get; set; }
     }
-    public class CategoryName
-    {
-        public string ArabicName { get; set; }
-        public string EnglishName { get; set; }
-    }
+   
 }
