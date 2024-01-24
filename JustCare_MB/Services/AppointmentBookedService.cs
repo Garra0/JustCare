@@ -291,7 +291,7 @@ namespace JustCare_MB.Services
                 && x.Appointment.Id == x.Appointment.AppointmentBooked.AppointmentId)
                 .Select(x => new ActiveAppointmentBookedForDentistDto
                 {
-                    appointmentDto = new AppointmentDtoActiveAppointmentBookedDto
+                    appointmentBookedDto = new AppointmentBookedDtoActiveAppointmentBookedDto
                     {
 
                         Id = x.Id,
@@ -310,7 +310,7 @@ namespace JustCare_MB.Services
                     }
                 }
 
-                ).OrderBy(x => x.appointmentDto.Date).ToListAsync();
+                ).OrderBy(x => x.appointmentBookedDto.Date).ToListAsync();
 
             if (!activeAppointmentBookedDto.Any())
                 throw new NotFoundException

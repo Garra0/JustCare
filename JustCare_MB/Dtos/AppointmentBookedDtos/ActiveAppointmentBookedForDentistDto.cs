@@ -5,10 +5,10 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
 {
     public class ActiveAppointmentBookedForDentistDto
     {
-        public AppointmentDtoActiveAppointmentBookedDto appointmentDto { get; set; }
+        public AppointmentBookedDtoActiveAppointmentBookedDto appointmentBookedDto { get; set; }
         public patientInformationActiveAppointmentBooked userDto { get; set; }
     }
-    public class AppointmentDtoActiveAppointmentBookedDto
+    public class AppointmentBookedDtoActiveAppointmentBookedDto
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
