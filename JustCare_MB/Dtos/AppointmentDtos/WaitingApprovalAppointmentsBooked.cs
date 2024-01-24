@@ -26,6 +26,7 @@ namespace JustCare_MB.Dtos.AppointmentDtos
         public int? NationalId { get; set; } // 30818134
         public string UserType { get; set; }
         public string Gender { get; set; }
+        public string PatientName { get; set; }
     }
     public class CategoryDtoWaitingApprovalAppointments
     {

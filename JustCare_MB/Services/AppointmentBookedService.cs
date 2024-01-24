@@ -145,6 +145,7 @@ namespace JustCare_MB.Services
                         NationalId = x.PatientUser.NationalId,
                         UserType = x.PatientUser.UserType.ArabicType,
                         Gender = x.PatientUser.Gender.ArabicType,
+                        PatientName=x.PatientUser.FullName
                     },
                     Category = new CategoryDtoWaitingApprovalAppointments
                     {
