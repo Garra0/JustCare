@@ -13,6 +13,7 @@ namespace JustCare_MB.Services.IServices
         Task UpdateAppointment(int id, UpdateAppointmentDto updateAppointmentDto);
         Task<IEnumerable<GetMyAppointments>> MyAppointmentsByDintistToken();
         Task<CreateAppointmentDto> GetAppointmentDtoToShowCreatePage(int id);
+        Task<IEnumerable<MyAppointmentsByDintistTokenDto>> GetAllMyAppointmentNotBookedYet();
       
     }
 }

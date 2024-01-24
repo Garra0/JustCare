@@ -17,7 +17,7 @@ namespace JustCare_MB.Services.IServices
         Task UpdateAppointmentBooked(int Id, UpdateAppointmentBookedDto updateAppointmentBookedDto);
         //Task<IEnumerable<CategoryDto>> GetAllCategories();
         //Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int id);
-        Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken();
+       // Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken();
  }
 }
 

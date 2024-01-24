@@ -68,8 +68,12 @@ namespace JustCareAPI.Controllers
         { 
             return Ok(await _appointmentService.MyAppointmentsByDintistToken());
         }
-
-
+        [HttpGet("GetAllMyAppointmentNotBookedYet")]
+        public async Task<IActionResult> GetAllMyAppointmentNotBookedYet()
+        {
+            return Ok(await _appointmentService.GetAllMyAppointmentNotBookedYet());
+        }
+        
 
 
         //Task<Category> getCategoryObject(int id);

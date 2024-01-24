@@ -17,16 +17,6 @@ namespace JustCareAPI.Controllers
             _appointmentBookedService = appointmentBookedService;
         }
 
-        //[HttpGet("{id:int}", Name = "GetAllAppointmentsBooked")]
-        [HttpGet("GetAllAppointmentBooked", Name = "GetAllAppointmentBooked")]
-        public async Task<IActionResult> GetAllAppointmentsBooked()
-        {
-            IEnumerable<AppointmentBookedDtos> AppointmentBookedList;
-            AppointmentBookedList = await _appointmentBookedService
-                .GetAllAppointmentsBookedByUserToken();
-            return Ok(AppointmentBookedList);
-        }
-
         [HttpPost("CreateAppointmentBooked")]
         public async Task<IActionResult> CreateAppointmentBookedDto(CreateAppointmentBookedDto dto)
         {

@@ -148,7 +148,8 @@ namespace JustCare_MB.Services
                     },
                     Category = new CategoryDtoWaitingApprovalAppointments
                     {
-                        ArabicName = x.Appointment.Category.ArabicName
+                        ArabicName = x.Appointment.Category.ArabicName,
+                        EnglishName = x.Appointment.Category.EnglishName,
                     }
                 }).OrderBy(e => e.Date).ToListAsync();
 
@@ -319,29 +320,7 @@ namespace JustCare_MB.Services
 
 
 
-        public async Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken()
-        {
-            // token
-            var DentistIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
-            if (DentistIdClaim == null
-                || !int.TryParse(DentistIdClaim.Value, out int DentistId))
-                throw new NotFoundException("Dentist token invalid");
-
-            IEnumerable<AppointmentBookedDtos> appointmentBookedDtos =
-                await _context.AppointmentBookeds
-                .Where(x => x.Status != "Accepted" && x.PatientUserId == 10)
-                .Select(x => new AppointmentBookedDtos
-                {
-                    Id = x.Id,
-                    Date = x.Appointment.Date,
-                    ArabicName = x.Appointment.Category.ArabicName,
-                    PatientUserId = x.PatientUserId
-                })
-                .OrderBy(e => e.Date)
-                .ToListAsync();
-
-            return appointmentBookedDtos;
-        }
+     
 
 
     }

@@ -30,6 +30,7 @@ namespace JustCare_MB.Dtos.AppointmentDtos
     public class CategoryDtoWaitingApprovalAppointments
     {
         public string ArabicName { get; set; }
+        public string EnglishName { get; set; }
     }
     public class PatienImageDto
     {

@@ -295,7 +295,41 @@ namespace JustCare_MB.Services
                 }
                 return MyAppointmentDto;
         }
+        public async Task<IEnumerable<MyAppointmentsByDintistTokenDto>> GetAllMyAppointmentNotBookedYet()
+        {
+            _logger.LogInformation("Get AllMyAppointment Not Booked Yet");
 
+            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (userIdClaim == null
+                || !int.TryParse(userIdClaim.Value, out int dentistUserId))
+                throw new NotFoundException("The token invalid");
+
+            //Where(e => e.Id != e.AppointmentBooked.AppointmentId
+
+            IEnumerable<MyAppointmentsByDintistTokenDto> myAppointmentsByDintistTokenDto =
+                await _context.Appointments
+                .Where(x => x.DentistUserId == dentistUserId 
+                && x.Id!=x.AppointmentBooked.AppointmentId)
+                .Select(x=> new MyAppointmentsByDintistTokenDto 
+                {
+                   Id = x.Id,
+                   Date = x.Date,
+                    DentistDescription = x.DentistDescription,
+                    categoryName = new CategoryName
+                    {
+                        ArabicName = x.Category.ArabicName,
+                        EnglishName = x.Category.EnglishName,
+                    }
+                })
+                .OrderBy(e => e.Date)
+                .ToListAsync();
+
+            if (!myAppointmentsByDintistTokenDto.Any())
+                throw new NotFoundException("There are no Appointments not booked yet for this Dintist");
+
+            return myAppointmentsByDintistTokenDto;
+
+        }
 
 
 

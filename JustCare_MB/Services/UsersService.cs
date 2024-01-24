@@ -1,13 +1,11 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
 using JustCare_MB.Dtos;
-using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.User;
 using JustCare_MB.Helpers;
 using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
