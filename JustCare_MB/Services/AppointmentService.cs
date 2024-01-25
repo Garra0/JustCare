@@ -158,9 +158,13 @@ namespace JustCare_MB.Services
             if (!AppointmentDatesByCategoryId.Any())
                 throw new NotFoundException("There are no Appointments by this Category");
 
-            string CategoryName = await _context.Categories
+            CategoryName categoryName = await _context.Categories
                 .Where(e => e.Id == CategoryId)
-                .Select(x => x.ArabicName).FirstAsync();
+                .Select(x => new CategoryName
+                {
+                    ArabicName = x.ArabicName,
+                    EnglishName = x.EnglishName,
+                }).FirstOrDefaultAsync();
 
             if (Directory.Exists("C:\\Images\\UserAppointmentImages"))
             {
@@ -177,7 +181,7 @@ namespace JustCare_MB.Services
             }
             DatesDto dto = new DatesDto();
             dto.CategoryId = CategoryId;
-            dto.CategoryName = CategoryName;
+            dto.categoryName = categoryName;
             dto.appointmentDates = AppointmentDatesByCategoryId;
             return dto;
         }

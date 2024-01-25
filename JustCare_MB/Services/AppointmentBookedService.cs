@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using JustCare_MB.Data;
-using JustCare_MB.Dtos;
 using JustCare_MB.Dtos.AppointmentBookedDtos;
 using JustCare_MB.Dtos.AppointmentDtos;
 using JustCare_MB.Dtos.Category;
@@ -13,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Security.Claims;
 
 namespace JustCare_MB.Services
 {
@@ -119,8 +117,6 @@ namespace JustCare_MB.Services
                 || !int.TryParse(DentistIdClaim.Value, out int DentistId))
                 throw new NotFoundException("Dentist token invalid");
 
-
-
             IEnumerable<WaitingApprovalAppointmentsBooked> waitingApprovalAppointmentsBooked =
                 await _context.AppointmentBookeds
                 .Where(x => x.Status == "Appointment booked")
@@ -142,13 +138,13 @@ namespace JustCare_MB.Services
                     {
                         Id = x.PatientUser.Id,
                         PhoneNumber = x.PatientUser.PhoneNumber,
-                        BirthDay = x.PatientUser.BirthDay,
+                        Age = DateTime.Today.Year - x.PatientUser.BirthDay.Year,
                         NationalId = x.PatientUser.NationalId,
                         UserType = x.PatientUser.UserType.ArabicType,
                         Gender = x.PatientUser.Gender.ArabicType,
                         PatientName = x.PatientUser.FullName
                     },
-                    Category = new CategoryDtoWaitingApprovalAppointments
+                    Category = new CategoryName
                     {
                         ArabicName = x.Appointment.Category.ArabicName,
                         EnglishName = x.Appointment.Category.EnglishName,

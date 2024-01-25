@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JustCare_MB.Dtos.Category;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +11,7 @@ namespace JustCare_MB.Dtos.AppointmentBookedDtos
     {
         public int CategoryId { get; set; }
         public IEnumerable<AppointmentDates> appointmentDates { get; set; }
-        public string CategoryName { get; set; }
+        public CategoryName categoryName { get; set; }
         
     }
 }
