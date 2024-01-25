@@ -67,7 +67,12 @@ namespace JustCareAPI.Controllers
         {
             return Ok(await _appointmentBookedService.GetAllActiveAppointmentBookedForDentist());
         }
+        [HttpGet("GetAllActiveAppointmentBookedForPatient")]
 
+        public async Task<IActionResult> GetAllActiveAppointmentBookedForPatient()
+        {
+            return Ok(await _appointmentBookedService.GetAllActiveAppointmentBookedForPatient());
+        }
         //Task CreateAppointmentBooked(CreateAppointmentBookedDto appointmentBookedDto);
         //Task<bool> UpdateAppointmentBooked(AppointmentBookedDto appointmentBookedDto);
         //Task<bool> DeleteAppointmentBooked(int appointmentBookedDtoId);

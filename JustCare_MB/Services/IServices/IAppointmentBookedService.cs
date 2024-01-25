@@ -14,11 +14,12 @@ namespace JustCare_MB.Services.IServices
         Task AppointmentBookedAccepted(int AppointmentBookedId);
         Task AppointmentBookedRejected(int AppointmentBookedId);
         Task DeleteAppointmentBooked(int appointmentBookedDtoId);
-        Task<IEnumerable<ActiveAppointmentBookedForDentistDto>> GetAllActiveAppointmentBookedForDentist();
+        Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForDentist();
         Task UpdateAppointmentBooked(int Id, UpdateAppointmentBookedDto updateAppointmentBookedDto);
+        Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForPatient();
         //Task<IEnumerable<CategoryDto>> GetAllCategories();
         //Task<CreateAppointmentBookedDto> CreateAppointmentBookedDto(int id);
-       // Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken();
+        // Task<IEnumerable<AppointmentBookedDtos>> GetAllAppointmentsBookedByUserToken();
  }
 }
 
