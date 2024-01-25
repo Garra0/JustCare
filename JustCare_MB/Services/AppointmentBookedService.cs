@@ -186,7 +186,7 @@ namespace JustCare_MB.Services
                 throw new InvalidIdException("appointmentBooked Id is not exist");
 
             AppointmentBooked appointmentBooked = await _context
-                .AppointmentBookeds.FirstAsync(x => x.Id == appointmentBookedId);
+                .AppointmentBookeds.FirstOrDefaultAsync(x => x.Id == appointmentBookedId);
             if (appointmentBooked == null)
                 throw new InvalidIdException("the appointmentId is wrong");
 
@@ -273,8 +273,9 @@ namespace JustCare_MB.Services
             _context.AppointmentBookeds.Update(appointmentBooked);
             await _context.SaveChangesAsync();
         }
+
         // Active Appointment Booked for Dentist page
-        public async Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForDentist()
+        public async Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForDentistByStatus(string Status)
         {
             _logger.LogInformation(
      $"Get All Get All Active AppointmentBooked For Dentist");
@@ -287,7 +288,7 @@ namespace JustCare_MB.Services
 
             IEnumerable<ActiveAppointmentBooked> activeAppointmentBookedDto =
                 await _context.AppointmentBookeds
-                .Where(x => x.Status == "Active")
+                .Where(x => x.Status == Status)
                 .Where(x => x.Appointment.DentistUserId == DentistId
                 && x.Appointment.Id == x.Appointment.AppointmentBooked.AppointmentId)
                 .Select(x => new ActiveAppointmentBooked
@@ -322,7 +323,7 @@ namespace JustCare_MB.Services
 
 
         // Active appointment booked for patient page
-        public async Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForPatient()
+        public async Task<IEnumerable<ActiveAppointmentBooked>> GetAllActiveAppointmentBookedForPatientByStatus(string Status)
         {
             _logger.LogInformation(
      $"get all get all active appointmentbooked for patient page");
@@ -334,7 +335,7 @@ namespace JustCare_MB.Services
 
             IEnumerable<ActiveAppointmentBooked> activeAppointmentBookedDto =
                 await _context.AppointmentBookeds
-                .Where(x => x.Status == "Active")
+                .Where(x => x.Status == Status)
                 .Where(x => x.PatientUserId == PatientId)
                 .Select(x => new ActiveAppointmentBooked
                 {
@@ -364,8 +365,29 @@ namespace JustCare_MB.Services
 
             return activeAppointmentBookedDto;
         }
+        // Close the Appointment booked
+        public async Task CloseAppointmentBooked(int appointmentBookedId)
+        {
+            _logger.LogInformation(
+      $"Close AppointmentBooked : {JsonConvert.SerializeObject(appointmentBookedId)}");
 
+            if (!await _context.AppointmentBookeds.AnyAsync(x => x.Id == appointmentBookedId))
+                throw new InvalidIdException("appointmentBooked Id is not exist");
 
+            AppointmentBooked appointmentBooked = await _context
+                .AppointmentBookeds.FirstOrDefaultAsync(x => x.Id == appointmentBookedId);
+            if (appointmentBooked == null)
+                throw new NotFoundException("the appointmentBooked is null");
+
+            if (appointmentBooked.Status == "Closed")
+                throw new ExistsException("This appoitnmentBooked have been Closed");
+
+            appointmentBooked.Status = "Closed";
+            _context.AppointmentBookeds.Update(appointmentBooked);
+            await _context.SaveChangesAsync();
+        }
+
+        
 
 
 
