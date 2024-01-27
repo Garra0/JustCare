@@ -4,6 +4,8 @@ using JustCare_MB.Models;
 using JustCare_MB.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using System.Net.Mail;
 
 namespace JustCareAPI.Controllers
 {
@@ -47,6 +49,30 @@ namespace JustCareAPI.Controllers
             await _userService.Register(userRegisterDto);
             return Ok();
         }
+        //[AllowAnonymous]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[HttpPost("Register2")]
+        //public async Task<IActionResult> Register2(string email)
+        //{
+        //    var message = new MimeMessage();
+        //    message.From.Add(new MailboxAddress("osama", "osama2002amjad@gmail.com"));
+        //    message.To.Add(new MailboxAddress("User Name", "osama2002amjad@gmail.com"));
+        //    message.Subject = "Verify Your Email";
+        //    message.Body = new TextPart("plain")
+        //    {
+        //        Text = "Click the following link to verify your email: verification-link"
+        //    };
+
+        //    using (var client = new SmtpClient())
+        //    {
+        //        client.Connect("smtp.example.com", 587, false);
+        //        client.Authenticate("your-username", "your-password");
+        //        client.Send(message);
+        //        client.Disconnect(true);
+        //    }
+        //    return Ok();
+        //}
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

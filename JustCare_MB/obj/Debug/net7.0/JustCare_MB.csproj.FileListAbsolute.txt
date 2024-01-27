@@ -85,3 +85,5 @@ C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\Serilog.Sinks.Deb
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\System.Text.Encodings.Web.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\System.Text.Json.dll
 C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\runtimes\browser\lib\net7.0\System.Text.Encodings.Web.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\SendGrid.dll
+C:\Users\Smail_-\Desktop\JustCare\JustCare_MB\bin\Debug\net7.0\StarkbankEcdsa.dll
