@@ -40,6 +40,16 @@ namespace JustCare_MB.Services
             _logger.LogInformation(
      $"Create AppointmentBooked: {JsonConvert.SerializeObject(appointmentBookedDto)}");
 
+            var patientIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
+            if (patientIdClaim == null
+                || !int.TryParse(patientIdClaim.Value, out int patientId))
+                throw new NotFoundException("patient token invalid");
+
+            if (await _context.AppointmentBookeds
+                .CountAsync(x => x.PatientUserId == patientId
+                    && ( x.Status == "Active" || x.Status == "Appointment booked")) >= 2)
+                throw new ExistsException("You already have 2 active appointments");
+
             if (appointmentBookedDto.Images.Count > 5)
             {
                 throw new ImagesBadRequest("You can upload a maximum of 5 images.");
@@ -53,12 +63,7 @@ namespace JustCare_MB.Services
                 {
                     throw new ImagesBadRequest("Each image can have a maximum size of 5 MB.");
                 }
-            }
-
-            var patientIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst("Id");
-            if (patientIdClaim == null
-                || !int.TryParse(patientIdClaim.Value, out int patientId))
-                throw new NotFoundException("patient token invalid");
+            } 
 
             if (await _context.AppointmentBookeds
                 .AnyAsync(x => x.AppointmentId == appointmentBookedDto.AppointmentId))

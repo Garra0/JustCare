@@ -48,6 +48,12 @@ namespace JustCare_MB.Services
             if (userIdClaim == null
                 || !int.TryParse(userIdClaim.Value, out int dentistUserId))
                 throw new NotFoundException("The token invalid");
+           
+            if (await _context.Appointments.CountAsync(x => x.DentistUserId == dentistUserId) 
+                - await _context.AppointmentBookeds
+                .CountAsync(x => x.Appointment.DentistUserId == dentistUserId
+                    && x.Status == "Closed") >= 3)
+                throw new ExistsException("You already have 3 active appointments");
 
             // appointment not Exists?
             if (await _context.Appointments.AnyAsync(u => u.Date == appointmentDto.Date)
@@ -243,7 +249,7 @@ namespace JustCare_MB.Services
 
 
             Appointment appointment = await _context.Appointments
-                .FirstOrDefaultAsync(x=>x.Id==Id);
+                .FirstOrDefaultAsync(x => x.Id == Id);
             if (appointment == null)
             {
                 throw new NotFoundException("appointment not found");
@@ -267,7 +273,7 @@ namespace JustCare_MB.Services
 
             IEnumerable<GetMyAppointments> MyAppointmentDto =
                 await _context.Appointments
-                .Where(x=>x.DentistUserId== dentistUserId)
+                .Where(x => x.DentistUserId == dentistUserId)
                 .Select(x => new GetMyAppointments
                 {
                     Id = x.Id,
@@ -275,7 +281,7 @@ namespace JustCare_MB.Services
                     CategoryArabicName = x.Category.ArabicName,
                     CategoryEnglishName = x.Category.EnglishName,
                     DentistDescription = x.DentistDescription,
-                    Images =  x.UserAppointmentImages.Select(e=> new MyAppointmentImageDto
+                    Images = x.UserAppointmentImages.Select(e => new MyAppointmentImageDto
                     {
                         ImageName = e.ImageName,
                     }).ToList()
@@ -293,12 +299,12 @@ namespace JustCare_MB.Services
                     {
                         if (File.Exists("C:\\Images\\UserAppointmentImages\\"
                             + myAppointmentImageDto.ImageName))
-                            myAppointmentImageDto.ImageData = 
+                            myAppointmentImageDto.ImageData =
                                 await File.ReadAllBytesAsync("C:\\Images\\UserAppointmentImages\\"
                             + myAppointmentImageDto.ImageName);
                     }
                 }
-                return MyAppointmentDto;
+            return MyAppointmentDto;
         }
         public async Task<IEnumerable<MyAppointmentsByDintistTokenDto>> GetAllMyAppointmentNotBookedYet()
         {
@@ -313,12 +319,12 @@ namespace JustCare_MB.Services
 
             IEnumerable<MyAppointmentsByDintistTokenDto> myAppointmentsByDintistTokenDto =
                 await _context.Appointments
-                .Where(x => x.DentistUserId == dentistUserId 
-                && x.Id!=x.AppointmentBooked.AppointmentId)
-                .Select(x=> new MyAppointmentsByDintistTokenDto 
+                .Where(x => x.DentistUserId == dentistUserId
+                && x.Id != x.AppointmentBooked.AppointmentId)
+                .Select(x => new MyAppointmentsByDintistTokenDto
                 {
-                   Id = x.Id,
-                   Date = x.Date,
+                    Id = x.Id,
+                    Date = x.Date,
                     DentistDescription = x.DentistDescription,
                     categoryName = new CategoryName
                     {
@@ -355,7 +361,7 @@ namespace JustCare_MB.Services
 
 
 
-        
+
 
 
 
