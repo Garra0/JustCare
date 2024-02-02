@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -78,6 +80,7 @@ namespace JustCare_MB.Services
                 .Select(x => x.UserType.EnglishType)
                 .FirstOrDefaultAsync();
 
+            
             // equal to the above...
             //string UserRole =
             //    (await _context.Users
@@ -123,13 +126,43 @@ namespace JustCare_MB.Services
 
             return userLoginResponseDto;
         }
+        private int Authorization(string Email)
+        {
+            // send code using email
+            Random random = new Random();
+            int randomNumber = random.Next(1000, 10000);
 
-        public async Task Register(UserRegisterDto userRegisterDto)
+
+            MailMessage mailMessage = new MailMessage();
+            mailMessage.From = new MailAddress("OnlineJustCare@gmail.com");
+            mailMessage.To.Add(new MailAddress(Email));
+            mailMessage.Subject = "Email verification code - التحقق من الايميل";
+            mailMessage.Body =  "اهلا بك بتطبيق JustCare \n" + "يرجى ادخال رمز التحقق بالتطبيق: " + randomNumber + "\n" +
+                "Welcome to JustCare application \n Please enter the verification code in the application: " + randomNumber;
+            SmtpClient Smtp = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("OnlineJustCare@gmail.com", "zsukfqxxytedelba"),
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+            
+            Smtp.Send(mailMessage);
+
+            return randomNumber;
+        }
+
+        public async Task<int> Register(UserRegisterDto userRegisterDto)
         {
             if (await _context.Users.AnyAsync(u => u.Email.ToLower()
             == userRegisterDto.Email.ToLower()))
                 throw new ExistsException("Email is exists");
 
+            return Authorization(userRegisterDto.Email);
+        }
+
+        public async Task CreateTokenAndSaveUserOnDb(UserRegisterDto userRegisterDto)
+        {
             User user = _mapper.Map<User>(userRegisterDto);
 
             if (user.Email.ToLower().Contains("den.just.edu.jo"))

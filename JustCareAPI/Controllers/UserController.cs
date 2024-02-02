@@ -46,9 +46,16 @@ namespace JustCareAPI.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
         {
-            await _userService.Register(userRegisterDto);
+            return Ok(await _userService.Register(userRegisterDto));
+        }
+        [AllowAnonymous]
+        [HttpPost("CreateTokenAndSaveUserOnDb")]
+        public async Task<IActionResult> CreateTokenAndSaveUserOnDb(UserRegisterDto userRegisterDto)
+        {
+            await _userService.CreateTokenAndSaveUserOnDb(userRegisterDto);
             return Ok();
         }
+        
         //[AllowAnonymous]
         //[ProducesResponseType(StatusCodes.Status200OK)]
         //[ProducesResponseType(StatusCodes.Status400BadRequest)]

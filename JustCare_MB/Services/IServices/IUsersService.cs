@@ -7,7 +7,8 @@ namespace JustCare_MB.Services.IServices
     public interface IUsersService
     {
         Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin);
-        Task Register(UserRegisterDto userRegisterDto);
+        Task<int> Register(UserRegisterDto userRegisterDto);
+        Task CreateTokenAndSaveUserOnDb(UserRegisterDto userRegisterDto);
         Task UpdateUser(UserDto userEdited);
         Task DeleteUser(int id);
         Task<User> GetUserById(int id); 
