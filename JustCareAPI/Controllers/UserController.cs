@@ -55,7 +55,19 @@ namespace JustCareAPI.Controllers
             await _userService.CreateTokenAndSaveUserOnDb(userRegisterDto);
             return Ok();
         }
-        
+        [AllowAnonymous]
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(string email)
+        {
+            return Ok(await _userService.ResetPassword(email));
+        }
+        [AllowAnonymous]
+        [HttpPut("ConfirmResetPassword")]
+        public async Task<IActionResult> ConfirmResetPassword(ConfirmResetPasswordDto confirmResetPasswordDto)
+        {
+            await _userService.ConfirmResetPassword(confirmResetPasswordDto);
+            return Ok();
+        }
         //[AllowAnonymous]
         //[ProducesResponseType(StatusCodes.Status200OK)]
         //[ProducesResponseType(StatusCodes.Status400BadRequest)]

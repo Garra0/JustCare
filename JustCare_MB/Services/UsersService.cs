@@ -126,11 +126,12 @@ namespace JustCare_MB.Services
 
             return userLoginResponseDto;
         }
-        private int Authorization(string Email)
+        Random random = new Random();
+        int randomNumber;
+        private void Authorization(string Email)
         {
             // send code using email
-            Random random = new Random();
-            int randomNumber = random.Next(1000, 10000);
+            randomNumber = random.Next(1000, 10000);
 
 
             MailMessage mailMessage = new MailMessage();
@@ -149,16 +150,15 @@ namespace JustCare_MB.Services
             
             Smtp.Send(mailMessage);
 
-            return randomNumber;
         }
-
         public async Task<int> Register(UserRegisterDto userRegisterDto)
         {
             if (await _context.Users.AnyAsync(u => u.Email.ToLower()
             == userRegisterDto.Email.ToLower()))
                 throw new ExistsException("Email is exists");
 
-            return Authorization(userRegisterDto.Email);
+            Authorization(userRegisterDto.Email);
+            return randomNumber;
         }
 
         public async Task CreateTokenAndSaveUserOnDb(UserRegisterDto userRegisterDto)
@@ -183,6 +183,63 @@ namespace JustCare_MB.Services
 
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
+        }
+
+        int randomResetPasswordNumber;
+        private  void AuthorizationForResetPassword(string Email)
+        {
+            // send code using email
+            randomResetPasswordNumber = random.Next(1000, 10000);
+
+
+            MailMessage mailMessage = new MailMessage();
+            mailMessage.From = new MailAddress("OnlineJustCare@gmail.com");
+            mailMessage.To.Add(new MailAddress(Email));
+            mailMessage.Subject = "Reset password - تغيير كلمة المرور ";
+            mailMessage.Body = "اهلا بك بتطبيق JustCare \n" + "يرجى ادخال رمز التحقق بالتطبيق لتغيير كلمة المرور: " + randomResetPasswordNumber + "\n" +
+                "Welcome to JustCare application \n Please enter the verification code in the application to reset password: " + randomResetPasswordNumber;
+            SmtpClient Smtp = new SmtpClient("smtp.gmail.com")
+            {
+                Port = 587,
+                Credentials = new NetworkCredential("OnlineJustCare@gmail.com", "zsukfqxxytedelba"),
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network
+            };
+
+            Smtp.Send(mailMessage);
+
+        }
+        public async Task<int> ResetPassword(string email)
+        {
+            if (! await _context.Users.AnyAsync(u => u.Email.ToLower()
+                        == email.ToLower()))
+                throw new NotFoundException("Email is not exists");
+
+            AuthorizationForResetPassword(email);
+            return randomResetPasswordNumber;
+        }
+        public async Task ConfirmResetPassword(ConfirmResetPasswordDto confirmResetPasswordDto)
+        {
+            _logger.LogInformation(
+     $"Delete user: {confirmResetPasswordDto.Email}");
+
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Email == confirmResetPasswordDto.Email);
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            byte[] hash;
+            using (MD5 md5 = MD5.Create())
+            {
+                hash = md5.ComputeHash(Encoding.UTF8.GetBytes(confirmResetPasswordDto.Password));
+            }
+            string hashedPassword = BitConverter.ToString(hash).Replace("-", "").ToLower();
+
+            user.Password = hashedPassword;
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+
         }
 
         public async Task DeleteUser(int id)

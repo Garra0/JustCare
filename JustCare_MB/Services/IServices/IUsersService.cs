@@ -9,6 +9,8 @@ namespace JustCare_MB.Services.IServices
         Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin);
         Task<int> Register(UserRegisterDto userRegisterDto);
         Task CreateTokenAndSaveUserOnDb(UserRegisterDto userRegisterDto);
+        Task<int> ResetPassword(string email);
+        Task ConfirmResetPassword(ConfirmResetPasswordDto confirmResetPasswordDto);
         Task UpdateUser(UserDto userEdited);
         Task DeleteUser(int id);
         Task<User> GetUserById(int id); 
