@@ -42,7 +42,8 @@ namespace JustCare_MB.Models
         public DateTime BirthDay { get; set; } //
         public int? NationalId { get; set; } // 30818134
 
-
+        public int LoginCount { get; set; }
+        public DateTime LoginBlock { get; set; }
         // Relations: .. Nivation props
 
         // public Review Review { get; set; }

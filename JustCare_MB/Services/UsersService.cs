@@ -38,13 +38,34 @@ namespace JustCare_MB.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
+        private async Task UpdateLoginCount(string email)
+        {
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+            if(user.LoginCount>2)
+            {
+                user.LoginCount = 0;
+                user.LoginBlock = DateTime.Now.AddMinutes(1);
+            }
+            else
+            {
+                user.LoginCount++;
+            }
+            // update need a special map, copy the userEdited to user and save the other attribuits on user
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
         //To authenticate user
-        private User Authenticate(UserLoginRequestDto userLogin)
+        private async Task<User> Authenticate(UserLoginRequestDto userLogin)
         {
             var currentUser = _context.Users.FirstOrDefault(x => x.Email.ToLower() ==
                 userLogin.Email.ToLower());
             if (currentUser == null)
                 throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
+           
+            User user = await _context.Users.FirstOrDefaultAsync(x => x.Email == userLogin.Email);
+
+            if (user.LoginBlock > DateTime.Now)
+                throw new ImagesBadRequest("You cant login now, you have blocked for 1 minute");
 
             byte[] hash;
             using (MD5 md5 = MD5.Create())
@@ -53,7 +74,12 @@ namespace JustCare_MB.Services
             }
             string hashedPassword = BitConverter.ToString(hash).Replace("-", "").ToLower();
             if (currentUser.Password != hashedPassword)
+            {
+                await UpdateLoginCount(userLogin.Email);
+                if (user.LoginBlock > DateTime.Now)
+                    throw new ImagesBadRequest("You cant login now, you have blocked for 1 minute");
                 throw new InvalidUserPasswordOrUserNotExistException("User not exist or Invalid Password");// notfound
+            }
 
             return currentUser;
         }
@@ -121,7 +147,7 @@ namespace JustCare_MB.Services
         {
             UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto();
 
-            var user = Authenticate(userLogin);// user exist?
+            User user = await Authenticate(userLogin);// user exist?
             await GenerateTokenAndCreateUserLoginDto(user, userLoginResponseDto);
 
             return userLoginResponseDto;

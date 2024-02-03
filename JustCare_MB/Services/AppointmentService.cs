@@ -36,6 +36,7 @@ namespace JustCare_MB.Services
         //2-
         public async Task CreateAppointment(CreateAppointmentDto appointmentDto)
         {
+            appointmentDto.Date = appointmentDto.Date.AddHours(-3);
             // image size / other way to get the id / no more 3 appointments
             _logger.LogInformation(
                  $"Create Appointment: {JsonConvert.SerializeObject(appointmentDto)}");
@@ -48,11 +49,12 @@ namespace JustCare_MB.Services
             if (userIdClaim == null
                 || !int.TryParse(userIdClaim.Value, out int dentistUserId))
                 throw new NotFoundException("The token invalid");
-           
-            if (await _context.Appointments.CountAsync(x => x.DentistUserId == dentistUserId) 
-                - await _context.AppointmentBookeds
+            int x = await _context.Appointments.CountAsync(x => x.DentistUserId == dentistUserId);
+            int y = await _context.AppointmentBookeds
                 .CountAsync(x => x.Appointment.DentistUserId == dentistUserId
-                    && x.Status == "Closed") >= 3)
+                    && x.Status == "Closed");
+            if (x
+                - y  >= 3)
                 throw new ExistsException("You already have 3 active appointments");
 
             // appointment not Exists?
@@ -68,6 +70,10 @@ namespace JustCare_MB.Services
             // the appointment should be after 12h at least
             if (appointmentDto.Date < DateTime.Now.AddHours(12))
                 throw new TimeNotValid("The appointment must be at least 12 hours away");
+
+            if (appointmentDto.Date > DateTime.Now.AddMonths(3))
+                throw new TimeNotValid("The appointment must be at most 3 months away");
+
 
             bool flag = false;
             foreach (var image in appointmentDto.Images)

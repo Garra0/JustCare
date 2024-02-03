@@ -233,6 +233,12 @@ namespace JustCare_MB.Migrations
                     b.Property<int>("GenderId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("LoginBlock")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("LoginCount")
+                        .HasColumnType("int");
+
                     b.Property<int?>("NationalId")
                         .HasColumnType("int");
 
@@ -349,6 +355,7 @@ namespace JustCare_MB.Migrations
                     b.HasOne("JustCare_MB.Models.Appointment", "Appointment")
                         .WithOne("AppointmentBooked")
                         .HasForeignKey("JustCare_MB.Models.AppointmentBooked", "AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("JustCare_MB.Models.User", "PatientUser")
