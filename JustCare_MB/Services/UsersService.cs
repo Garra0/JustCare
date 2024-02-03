@@ -142,14 +142,21 @@ namespace JustCare_MB.Services
             userLoginResponseDto.Token = StringToken; // token saved here
             userLoginResponseDto.UserName = user.FullName;
         }
-
+        private async Task UpdateLoginCountToZero(User user)
+        {            
+                user.LoginCount = 0;
+                user.LoginBlock = DateTime.Now.AddMinutes(1);
+            
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+        }
         public async Task<UserLoginResponseDto> Login(UserLoginRequestDto userLogin)
         {
             UserLoginResponseDto userLoginResponseDto = new UserLoginResponseDto();
 
             User user = await Authenticate(userLogin);// user exist?
             await GenerateTokenAndCreateUserLoginDto(user, userLoginResponseDto);
-
+            await UpdateLoginCountToZero(user);
             return userLoginResponseDto;
         }
         Random random = new Random();
